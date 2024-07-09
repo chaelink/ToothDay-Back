@@ -37,7 +37,7 @@ public class Post {
     private List<Like> likeList = new ArrayList<>();
 
 
-    //user
+    //user 정보
 
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
