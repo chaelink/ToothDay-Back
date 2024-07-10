@@ -14,7 +14,7 @@ import java.util.List;
 @Entity
 public class Post {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "postId")
     private int postId;
 

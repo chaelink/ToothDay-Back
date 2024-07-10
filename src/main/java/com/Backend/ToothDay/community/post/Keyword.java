@@ -11,7 +11,7 @@ import java.util.List;
 @Entity
 public class Keyword {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "keywordId")
     private int keywordId;
 
