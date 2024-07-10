@@ -1,7 +1,7 @@
 package com.Backend.ToothDay.community.post;
 
 import com.Backend.ToothDay.community.comment.Comment;
-import com.Backend.ToothDay.community.like.Like;
+import com.Backend.ToothDay.community.like.PostLike;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,7 +9,6 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter @Setter
 @Entity
@@ -34,7 +33,7 @@ public class Post {
     private List<Comment> commentList = new ArrayList<>();
 
     @OneToMany(mappedBy = "post")
-    private List<Like> likeList = new ArrayList<>();
+    private List<PostLike> likeList = new ArrayList<>();
 
 
     //user 정보

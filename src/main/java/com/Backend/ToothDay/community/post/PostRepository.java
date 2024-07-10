@@ -15,31 +15,33 @@ public class PostRepository {
     public Post save(Post post, List<Integer> keywordIds) {
         em.persist(post);
         if(keywordIds == null) {
-            Keyword keyword = new Keyword();
-            keyword.setKeywordId(1);
+            Keyword keyword = em.find(Keyword.class,1);
             PostKeyword postKeyword = new PostKeyword();
-            PostKeywordId postKeywordId = new PostKeywordId(post.getPostId(), 1);
+            PostKeywordId postKeywordId = new PostKeywordId(post.getPostId(), keyword.getKeywordId());
             postKeyword.setPostKeywordId(postKeywordId);
             postKeyword.setPost(post);
             postKeyword.setKeyword(keyword);
             em.persist(postKeyword);
             post.getPostKeywords().add(postKeyword);
         }
-        for (Integer keywordId : keywordIds) {
-            Keyword keyword = em.find(Keyword.class, keywordId);
-            if(keyword != null) {
-                PostKeyword postKeyword = new PostKeyword();
-                PostKeywordId postKeywordId = new PostKeywordId(post.getPostId(), keywordId);
-                postKeyword.setPostKeywordId(postKeywordId);
-                postKeyword.setPost(post);
-                postKeyword.setKeyword(keyword);
-                em.persist(postKeyword);
-                post.getPostKeywords().add(postKeyword);
-            }
-            else {
-                throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
+        else {
+            for (Integer keywordId : keywordIds) {
+                Keyword keyword = em.find(Keyword.class, keywordId);
+                if(keyword != null) {
+                    PostKeyword postKeyword = new PostKeyword();
+                    PostKeywordId postKeywordId = new PostKeywordId(post.getPostId(), keywordId);
+                    postKeyword.setPostKeywordId(postKeywordId);
+                    postKeyword.setPost(post);
+                    postKeyword.setKeyword(keyword);
+                    em.persist(postKeyword);
+                    post.getPostKeywords().add(postKeyword);
+                }
+                else {
+                    throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
+                }
             }
         }
+
         return post;
     }
 
@@ -59,6 +61,10 @@ public class PostRepository {
 
     public void delete(Post post) {
         em.remove(em.merge(post));
+    }
+
+    public Keyword findKeywordById(int keywordId) {
+        return em.find(Keyword.class, keywordId);
     }
 
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
@@ -21,11 +22,11 @@ public class PostController {
     }
 
     @PostMapping("/community/upload")
-    public String communityPostUpload(PostForm postForm, Model model) {
+    public String communityPostUpload(@ModelAttribute PostForm postForm, Model model) {
         Post post = new Post();
         post.setTitle(postForm.getTitle());
         post.setContent(postForm.getContent());
-        post.setImage(postForm.getImage());
+        //post.setImage(postForm.getImage());
         postService.save(post,postForm.getKeywords());
         model.addAttribute("postDTO",postService.getPostDTO(post));
         return "community/upload";

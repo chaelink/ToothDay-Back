@@ -9,7 +9,7 @@ import javax.persistence.*;
 
 @Getter @Setter
 @Entity
-public class Like {
+public class PostLike {
 
     @Id @GeneratedValue
     @Column(name = "likeId")

@@ -31,8 +31,8 @@ public class PostService {
         return postRepository.findById(postId);
     }
 
-    public Post save(Post post, List<Integer> keywordIds) {
-        return postRepository.save(post, keywordIds);
+    public void save(Post post, List<Integer> keywordIds) {
+        postRepository.save(post, keywordIds);
     }
 
     public Post update(Post post,List<Integer> keywordIds) {

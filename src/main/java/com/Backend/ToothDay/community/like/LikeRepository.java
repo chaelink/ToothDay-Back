@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class LikeRepository {
@@ -11,18 +12,18 @@ public class LikeRepository {
     @PersistenceContext
     private EntityManager em;
 
-    public void save(Like like) {
+    public void save(PostLike like) {
         em.persist(like);
     }
 
-    public void delete(Like like) {
+    public void delete(PostLike like) {
         em.remove(like);
     }
 
     public int countByPostId(int postId) {
-        Long count = (Long) em.createQuery("select l from Like l where l.post.postId=:postId")
-                .setParameter("postId", postId).getSingleResult();
-        return count.intValue();
+        List<PostLike> likes = em.createQuery("select l from PostLike l where l.post.postId=:postId", PostLike.class)
+                .setParameter("postId", postId).getResultList();
+        return likes.size();
     }
 
 }
