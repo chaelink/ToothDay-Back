@@ -11,7 +11,7 @@ import javax.persistence.*;
 @Entity
 public class PostLike {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "likeId")
     private int likeId;
 
