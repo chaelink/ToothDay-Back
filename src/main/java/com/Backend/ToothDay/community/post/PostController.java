@@ -3,40 +3,36 @@ package com.Backend.ToothDay.community.post;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
     @GetMapping("/community/upload")
-    public String createPostForm(Model model) {
-        model.addAttribute("postForm", new PostForm());
-        return "community/upload";  //(반환할 뷰 이름)프론트와 경로가 일치해야하니까 API명세에 추가해야하나?
+    public PostForm communityUploadForm() {
+        return new PostForm();
     }
 
     @PostMapping("/community/upload")
-    public String communityPostUpload(@ModelAttribute PostForm postForm, Model model) {
+    public PostDTO communityUpload(@RequestBody PostForm postForm) {
         Post post = new Post();
         post.setTitle(postForm.getTitle());
         post.setContent(postForm.getContent());
-        //post.setImage(postForm.getImage());
+        post.setImage(postForm.getImage());
+        post.setCreateDate(LocalDateTime.now());
         postService.save(post,postForm.getKeywords());
-        model.addAttribute("postDTO",postService.getPostDTO(post));
-        return "community/upload";
+        return postService.getPostDTO(post);
     }
 
-
     @GetMapping("/community")
-    public String communityMain(Model model) {
-        model.addAttribute("List<postDTO>",postService.getAllPostDTO());
-        return "community";
+    public List<PostDTO> communityMain() {
+        return postService.getAllPostDTO();
     }
 
 
