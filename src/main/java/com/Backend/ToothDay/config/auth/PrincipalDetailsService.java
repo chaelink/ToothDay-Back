@@ -1,7 +1,7 @@
-package com.Backend.jwtpart.config.auth;
+package com.Backend.ToothDay.config.auth;
 
-import com.Backend.jwtpart.repository.UserRepository;
-import com.Backend.jwtpart.model.User;
+import com.Backend.ToothDay.repository.UserRepository;
+import com.Backend.ToothDay.model.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

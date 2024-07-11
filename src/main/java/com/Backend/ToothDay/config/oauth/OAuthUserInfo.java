@@ -1,4 +1,4 @@
-package com.Backend.jwtpart.config.oauth;
+package com.Backend.ToothDay.config.oauth;
 
 public interface OAuthUserInfo {
     String getProviderId();

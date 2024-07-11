@@ -1,4 +1,4 @@
-package com.Backend.jwtpart.config;
+package com.Backend.ToothDay.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

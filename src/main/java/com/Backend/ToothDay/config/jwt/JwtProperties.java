@@ -1,4 +1,4 @@
-package com.Backend.jwtpart.config.jwt;
+package com.Backend.ToothDay.config.jwt;
 
 public interface JwtProperties {
     String SECRET = "swifffff50555"; // 우리 서버만 알고 있는 비밀값

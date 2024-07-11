@@ -1,4 +1,4 @@
-package com.Backend.jwtpart.config.jwt;
+package com.Backend.ToothDay.config.jwt;
 
 import java.io.IOException;
 
@@ -7,10 +7,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.Backend.jwtpart.config.auth.PrincipalDetails;
-import com.Backend.jwtpart.config.jwt.JwtProperties;
-import com.Backend.jwtpart.model.User;
-import com.Backend.jwtpart.repository.UserRepository;
+import com.Backend.ToothDay.config.auth.PrincipalDetails;
+import com.Backend.ToothDay.model.User;
+import com.Backend.ToothDay.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

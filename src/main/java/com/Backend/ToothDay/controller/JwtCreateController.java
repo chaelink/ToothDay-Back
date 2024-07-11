@@ -1,12 +1,12 @@
-package com.Backend.jwtpart.controller;
+package com.Backend.ToothDay.controller;
 import java.util.Date;
 import java.util.Map;
-import com.Backend.jwtpart.model.User;
+import com.Backend.ToothDay.model.User;
 
-import com.Backend.jwtpart.config.jwt.JwtProperties;
-import com.Backend.jwtpart.config.oauth.GoogleUser;
-import com.Backend.jwtpart.config.oauth.OAuthUserInfo;
-import com.Backend.jwtpart.repository.UserRepository;
+import com.Backend.ToothDay.config.jwt.JwtProperties;
+import com.Backend.ToothDay.config.oauth.GoogleUser;
+import com.Backend.ToothDay.config.oauth.OAuthUserInfo;
+import com.Backend.ToothDay.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
