@@ -1,0 +1,33 @@
+server:
+  port: 8000
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://52.78.196.67:3306/toothday
+    username: toothuser
+    password: 5ToothDay!
+
+  jpa:
+    hibernate:
+      ddl-auto: update #create update none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1054743034506-atjsapju5vt05ugd9oesgdi2mqqq5cir.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
