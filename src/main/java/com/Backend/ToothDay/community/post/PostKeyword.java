@@ -15,11 +15,11 @@ public class PostKeyword {
 
     @ManyToOne
     @MapsId("postId") //복합 키 매핑시 사용하는 애노테이션
-    @JoinColumn(name = "postId")
+    @JoinColumn(name = "post_id")
     private Post post;
 
     @ManyToOne
     @MapsId("keywordId")
-    @JoinColumn(name = "keywordId")
+    @JoinColumn(name = "keyword_id")
     private Keyword keyword;
 }

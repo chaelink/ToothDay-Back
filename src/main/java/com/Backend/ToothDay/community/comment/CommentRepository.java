@@ -20,8 +20,8 @@ public class CommentRepository {
         em.remove(em.merge(comment));
     }
 
-    public int countByPostId(int postId) {
-        List<Comment> comments = em.createQuery("select c from Comment c where c.post.postId = :postId", Comment.class)
+    public int countByPostId(long postId) {
+        List<Comment> comments = em.createQuery("select c from Comment c where c.post.id = :postId", Comment.class)
                 .setParameter("postId", postId).getResultList();
         return comments.size();
     }

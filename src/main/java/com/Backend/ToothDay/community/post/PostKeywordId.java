@@ -12,14 +12,14 @@ import java.io.Serializable;
 //복합키를 정의하는 클래스
 public class PostKeywordId implements Serializable {
 
-    private int postId;
-    private int keywordId;
+    private long postId;
+    private long keywordId;
 
     // 기본 생성자
     public PostKeywordId() {}
 
     // 생성자
-    public PostKeywordId(int postId, int keywordId) {
+    public PostKeywordId(long postId, int keywordId) {
         this.postId = postId;
         this.keywordId = keywordId;
     }
