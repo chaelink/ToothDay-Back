@@ -24,9 +24,6 @@ public class Post {
 
     private String image;
 
-    //@Transient
-    //private List<Integer> keywords;
-
     private LocalDateTime createDate;
 
     @OneToMany(mappedBy = "post")
