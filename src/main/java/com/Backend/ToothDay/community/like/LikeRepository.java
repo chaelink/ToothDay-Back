@@ -20,8 +20,8 @@ public class LikeRepository {
         em.remove(like);
     }
 
-    public int countByPostId(int postId) {
-        List<PostLike> likes = em.createQuery("select l from PostLike l where l.post.postId=:postId", PostLike.class)
+    public int countByPostId(long postId) {
+        List<PostLike> likes = em.createQuery("select l from PostLike l where l.post.id=:postId", PostLike.class)
                 .setParameter("postId", postId).getResultList();
         return likes.size();
     }

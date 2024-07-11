@@ -15,8 +15,8 @@ import java.util.List;
 public class Post {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "postId")
-    private int postId;
+    @Column(name = "post_id")
+    private long id;
 
     private String title;
 

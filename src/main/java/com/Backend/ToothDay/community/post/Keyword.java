@@ -12,8 +12,8 @@ import java.util.List;
 public class Keyword {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "keywordId")
-    private int keywordId;
+    @Column(name = "keyword_id")
+    private int id;
 
     @Enumerated(EnumType.STRING)
     private KeywordName keywordName;

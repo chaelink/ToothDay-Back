@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 public class Comment {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "commentId")
-    private int commentId;
+    @Column(name = "comment_id")
+    private long id;
 
-    @JoinColumn(name="postId")
+    @JoinColumn(name="post_id")
     @ManyToOne
     private Post post;
 

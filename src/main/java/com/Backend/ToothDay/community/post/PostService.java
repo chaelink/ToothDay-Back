@@ -48,7 +48,7 @@ public class PostService {
 
     public PostDTO getPostDTO(Post post) {
         PostDTO postDTO = new PostDTO();
-        postDTO.setPostId(post.getPostId());
+        postDTO.setPostId(post.getId());
         postDTO.setTitle(post.getTitle());
         postDTO.setContent(post.getContent());
         postDTO.setImage(post.getImage());
@@ -56,13 +56,13 @@ public class PostService {
         //postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
 
         List<Integer> keywords = post.getPostKeywords().stream()
-                .map(pk -> pk.getKeyword().getKeywordId())
+                .map(pk -> pk.getKeyword().getId())
                 .collect(Collectors.toList());
         postDTO.setKeywords(keywords);
 
         postDTO.setCreateDate(post.getCreateDate());
-        postDTO.setCommentCount(commentRepository.countByPostId(post.getPostId()));
-        postDTO.setLikeCount(likeRepository.countByPostId(post.getPostId()));
+        postDTO.setCommentCount(commentRepository.countByPostId(post.getId()));
+        postDTO.setLikeCount(likeRepository.countByPostId(post.getId()));
         return postDTO;
     }
 
