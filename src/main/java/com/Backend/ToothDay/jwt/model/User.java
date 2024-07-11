@@ -6,9 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -22,13 +25,19 @@ public class User {
     @Column(name = "user_id")
     private long id;
 
-    @Column(unique = true)
     private String username;
-    private String realname;
+
+    @Column(unique = true)
     private String email;
+
     private String roles;
+    private String profileImageUrl;
     private String providerId;
     private String provider;
+
+    @CreationTimestamp
+    private Timestamp createDate;
+
 
     // ENUM으로 안하고 ,로 해서 구분해서 ROLE을 입력 -> 그걸 파싱!!
     public List<String> getRoleList(){
