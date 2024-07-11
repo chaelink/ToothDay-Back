@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.model;
+package com.Backend.ToothDay.jwt.model;
 
 import javax.persistence.*;
 

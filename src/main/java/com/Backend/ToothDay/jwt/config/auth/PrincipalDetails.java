@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.config.auth;
+package com.Backend.ToothDay.jwt.config.auth;
 
 
 import java.util.ArrayList;
@@ -6,7 +6,7 @@ import java.util.Collection;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import com.Backend.ToothDay.model.User;
+import com.Backend.ToothDay.jwt.model.User;
 
 public class PrincipalDetails implements UserDetails{
 

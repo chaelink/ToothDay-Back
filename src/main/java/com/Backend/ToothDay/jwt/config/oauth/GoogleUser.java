@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.config.oauth;
+package com.Backend.ToothDay.jwt.config.oauth;
 
 import java.util.Map;
 

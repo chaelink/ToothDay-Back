@@ -1,7 +1,7 @@
-package com.Backend.ToothDay.config;
-import com.Backend.ToothDay.config.jwt.JwtAuthenticationFilter;
-import com.Backend.ToothDay.config.jwt.JwtAuthorizationFilter;
-import com.Backend.ToothDay.repository.UserRepository;
+package com.Backend.ToothDay.jwt.config;
+import com.Backend.ToothDay.jwt.config.jwt.JwtAuthenticationFilter;
+import com.Backend.ToothDay.jwt.config.jwt.JwtAuthorizationFilter;
+import com.Backend.ToothDay.jwt.repository.UserRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;

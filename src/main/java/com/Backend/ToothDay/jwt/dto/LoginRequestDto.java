@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.dto;
+package com.Backend.ToothDay.jwt.dto;
 
 import lombok.Data;
 
