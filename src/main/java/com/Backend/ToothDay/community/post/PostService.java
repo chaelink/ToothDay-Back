@@ -2,6 +2,7 @@ package com.Backend.ToothDay.community.post;
 
 import com.Backend.ToothDay.community.comment.CommentRepository;
 import com.Backend.ToothDay.community.like.LikeRepository;
+import com.Backend.ToothDay.jwt.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -55,7 +56,7 @@ public class PostService {
         //유저 정보 설정
         User user = post.getUser();
         if (user != null) {
-            PostDTO.UserDTO userDTO = new PostDTO.UserDTO();
+            UserDTO userDTO = new UserDTO();
             userDTO.setId(user.getId());
             userDTO.setUsername(user.getUsername());
             userDTO.setProfileImageUrl(user.getProfileImageUrl());
