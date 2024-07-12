@@ -7,6 +7,10 @@ import com.Backend.ToothDay.jwt.config.oauth.GoogleUser;
 import com.Backend.ToothDay.jwt.config.oauth.OAuthUserInfo;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,7 +24,7 @@ public class JwtCreateController {
     private final UserRepository userRepository;
 
     @PostMapping("/oauth/jwt/google")
-    public String jwtCreate(@RequestBody Map<String, Object> data) {
+    public ResponseEntity<String> jwtCreate(@RequestBody Map<String, Object> data) {
         System.out.println("jwtCreate 실행됨");
         System.out.println(data.get("profileObj"));
         // OAuthUserInfo 인터페이스를 통해 GoogleUser 객체 생성
@@ -32,10 +36,9 @@ public class JwtCreateController {
         System.out.println("Email: " + googleUser.getEmail());
         System.out.println("Name: " + googleUser.getName());
 
-        User userEntity =
-                userRepository.findByUsername(googleUser.getName());
+        User userEntity = userRepository.findByEmail(googleUser.getEmail());
 
-        if(userEntity == null) {
+        if (userEntity == null) {
             User userRequest = User.builder()
                     .username(googleUser.getName())
                     .profileImageUrl(googleUser.getProfileImageUrl())
@@ -46,11 +49,13 @@ public class JwtCreateController {
                     .build();
 
             userEntity = userRepository.save(userRequest);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 회원가입된 유저입니다");
         }
 
         // JwtUtil을 사용하여 JWT Token 생성
         String jwtToken = JwtUtil.generateToken(userEntity.getUsername(), userEntity.getId());
 
-        return jwtToken;
+        return ResponseEntity.ok(jwtToken);
     }
 }
