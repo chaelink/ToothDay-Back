@@ -9,7 +9,7 @@ import javax.persistence.Transient;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
-
+import com.Backend.ToothDay.jwt.model.User;
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -23,16 +23,15 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List<Post> findByKeywordId(int keywordId) {
-        return postRepository.findByKeywordId(keywordId);
-    }
+//    public List<Post> findByKeywordId(int keywordId) {
+//        return postRepository.findByKeywordId(keywordId);
+//    }
 
     public Post findById(int postId) {
         return postRepository.findById(postId);
     }
 
     public void save(Post post, List<Integer> keywordIds) {
-
         postRepository.save(post, keywordIds);
     }
 
@@ -53,7 +52,16 @@ public class PostService {
         postDTO.setContent(post.getContent());
         postDTO.setImage(post.getImage());
 
-        //postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
+        //유저 정보 설정
+        User user = post.getUser();
+        if (user != null) {
+            PostDTO.UserDTO userDTO = new PostDTO.UserDTO();
+            userDTO.setId(user.getId());
+            userDTO.setUsername(user.getUsername());
+            userDTO.setProfileImageUrl(user.getProfileImageUrl());
+            userDTO.setEmail(user.getEmail());
+            postDTO.setUser(userDTO);
+        }
 
         List<Integer> keywords = post.getPostKeywords().stream()
                 .map(pk -> pk.getKeyword().getId())
