@@ -50,7 +50,13 @@ public class JwtCreateController {
 
             userEntity = userRepository.save(userRequest);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 회원가입된 유저입니다");
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("이미 회원가입된 유저입니다");
+            // 이미 등록된 사용자인 경우에는 정보를 업데이트
+            userEntity.setUsername(googleUser.getName());
+            userEntity.setProfileImageUrl(googleUser.getProfileImageUrl());
+            userEntity.setProvider(googleUser.getProvider());
+            userEntity.setProviderId(googleUser.getProviderId());
+            userEntity = userRepository.save(userEntity);
         }
 
         // JwtUtil을 사용하여 JWT Token 생성
