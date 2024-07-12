@@ -2,6 +2,7 @@ package com.Backend.ToothDay.visit.model;
 
 
 import com.Backend.ToothDay.jwt.model.User;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,7 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Data
@@ -31,16 +33,21 @@ public class Visit {
     @Temporal(TemporalType.DATE)
     private Date visitDate;
 
-    private boolean isShared;
+    @Column(name = "is_shared")
+    @JsonProperty("shared")
+    private boolean isShared = false;  // 기본 값 설정
 
     @CreationTimestamp
     private Timestamp createDate;
 
-    private Long dentistId;
-    private String dentistName;
-    private String dentistAddress;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "dentist_id", nullable = false)
+    private Dentist dentist;
+
+    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Treatment> treatmentlist;
 }
