@@ -4,6 +4,7 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
 @Repository
 public class CommentRepository {
@@ -19,10 +20,10 @@ public class CommentRepository {
         em.remove(em.merge(comment));
     }
 
-    public int countByPostId(int postId) {
-        Long count = (Long) em.createQuery("select c from Comment c where c.post.postId = :postId")
-                .setParameter("postId", postId).getSingleResult();
-        return count.intValue();
+    public int countByPostId(long postId) {
+        List<Comment> comments = em.createQuery("select c from Comment c where c.post.id = :postId", Comment.class)
+                .setParameter("postId", postId).getResultList();
+        return comments.size();
     }
 
 }

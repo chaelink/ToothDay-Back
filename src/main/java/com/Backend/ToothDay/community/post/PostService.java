@@ -31,12 +31,15 @@ public class PostService {
         return postRepository.findById(postId);
     }
 
-    public Post save(Post post, List<Integer> keywordIds) {
-        return postRepository.save(post, keywordIds);
+    public void save(Post post, List<Integer> keywordIds) {
+
+        postRepository.save(post, keywordIds);
     }
 
     public Post update(Post post,List<Integer> keywordIds) {
-        return postRepository.save(post, keywordIds);
+
+        postRepository.save(post, keywordIds);
+        return post;
     }
 
     public void delete(Post post) {
@@ -45,14 +48,21 @@ public class PostService {
 
     public PostDTO getPostDTO(Post post) {
         PostDTO postDTO = new PostDTO();
-        postDTO.setPostId(post.getPostId());
+        postDTO.setPostId(post.getId());
         postDTO.setTitle(post.getTitle());
         postDTO.setContent(post.getContent());
         postDTO.setImage(post.getImage());
-        postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
+
+        //postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
+
+        List<Integer> keywords = post.getPostKeywords().stream()
+                .map(pk -> pk.getKeyword().getId())
+                .collect(Collectors.toList());
+        postDTO.setKeywords(keywords);
+
         postDTO.setCreateDate(post.getCreateDate());
-        postDTO.setCommentCount(commentRepository.countByPostId(post.getPostId()));
-        postDTO.setLikeCount(likeRepository.countByPostId(post.getPostId()));
+        postDTO.setCommentCount(commentRepository.countByPostId(post.getId()));
+        postDTO.setLikeCount(likeRepository.countByPostId(post.getId()));
         return postDTO;
     }
 

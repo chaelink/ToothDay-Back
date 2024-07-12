@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 @Entity
 public class Comment {
 
-    @Id @GeneratedValue
-    @Column(name = "commentId")
-    private int commentId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "comment_id")
+    private long id;
 
-    @JoinColumn(name="postId")
+    @JoinColumn(name="post_id")
     @ManyToOne
     private Post post;
 

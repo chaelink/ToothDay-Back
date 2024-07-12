@@ -9,13 +9,13 @@ import javax.persistence.*;
 
 @Getter @Setter
 @Entity
-public class Like {
+public class PostLike {
 
-    @Id @GeneratedValue
-    @Column(name = "likeId")
-    private int likeId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "like_id")
+    private long id;
 
-    @JoinColumn(name = "postId")
+    @JoinColumn(name = "post_id")
     @ManyToOne
     private Post post;
 
