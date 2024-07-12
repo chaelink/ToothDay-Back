@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface DentistRepository extends JpaRepository<Dentist, Integer> {
-
-    List<Dentist> findByDentistNameContainingIgnoreCase(String name);
+    List<Dentist> findByDentistNameContaining(String query);
 
 }

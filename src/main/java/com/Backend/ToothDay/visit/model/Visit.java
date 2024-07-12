@@ -19,9 +19,9 @@ import java.util.Date;
 @Builder
 public class Visit {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private int visitId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "visit_id")
+    private long id;
 
     // Removed redundant fields
     // private int dentistId;

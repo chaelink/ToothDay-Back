@@ -1,26 +1,28 @@
 package com.Backend.ToothDay.visit.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(name = "dentist") // 테이블 이름 지정
 public class Dentist {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // MySQL에서는 주로 Long 타입을 사용하는 것이 일반적
+    @Column(name = "dentist_id") // 컬럼 이름 지정
+    private Integer dentistId;
 
+    @Column(name = "dentist_name") // 컬럼 이름 지정
     private String dentistName;
+
+    @Column(name = "dentist_address") // 컬럼 이름 지정
     private String dentistAddress;
+
+    // getters and setters
 }
