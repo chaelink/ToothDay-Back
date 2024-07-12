@@ -39,11 +39,10 @@ public class JwtCreateController {
         System.out.println("Name: " + googleUser.getName());
 
         User userEntity =
-                userRepository.findByUsername(googleUser.getProvider()+"_"+googleUser.getProviderId());
+                userRepository.findByUsername(googleUser.getName());
 
         if(userEntity == null) {
             User userRequest = User.builder()
-                    .username(googleUser.getName())
                     .username(googleUser.getName())
                     .profileImageUrl(googleUser.getProfileImageUrl())
                     .email(googleUser.getEmail())
