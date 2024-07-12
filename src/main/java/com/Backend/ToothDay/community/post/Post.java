@@ -33,8 +33,10 @@ public class Post {
     @OneToMany(mappedBy = "post")
     private List<PostLike> likeList = new ArrayList<>();
 
+
+    //user 정보
+    @ManyToOne
     @JoinColumn(name = "user_id")
-    @ManyToOne(fetch = FetchType.EAGER)
     private User user;
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
