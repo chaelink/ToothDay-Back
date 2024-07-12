@@ -40,8 +40,7 @@ public class Visit {
     private String dentistName;
     private String dentistAddress;
 
-    @ManyToOne(fetch = FetchType.LAZY) // Many visits can be associated with one user
-    @JoinColumn(name = "userId", referencedColumnName = "id", nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
 }
