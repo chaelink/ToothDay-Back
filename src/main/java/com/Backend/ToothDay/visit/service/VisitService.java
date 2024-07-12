@@ -2,11 +2,9 @@ package com.Backend.ToothDay.visit.service;
 
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
-import com.Backend.ToothDay.visit.dto.TreatmentDTO;
 import com.Backend.ToothDay.visit.dto.VisitRecordDTO;
 import com.Backend.ToothDay.visit.model.Dentist;
-import com.Backend.ToothDay.visit.model.ToothNumber;
-import com.Backend.ToothDay.visit.model.Treatment;
+//import com.Backend.ToothDay.visit.model.Treatment;
 import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.repository.DentistRepository;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
@@ -16,9 +14,6 @@ import org.springframework.stereotype.Service;
 import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class VisitService {

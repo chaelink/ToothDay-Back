@@ -48,6 +48,6 @@ public class Visit {
     @JoinColumn(name = "dentist_id", nullable = false)
     private Dentist dentist;
 
-    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Treatment> treatmentlist;
+//    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Treatment> treatmentlist;
 }

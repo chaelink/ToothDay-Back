@@ -2,6 +2,7 @@ package com.Backend.ToothDay.community.post;
 
 import com.Backend.ToothDay.community.comment.Comment;
 import com.Backend.ToothDay.community.like.PostLike;
+import com.Backend.ToothDay.jwt.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -34,7 +35,9 @@ public class Post {
 
 
     //user 정보
-
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostKeyword> postKeywords = new ArrayList<>();
