@@ -44,6 +44,7 @@ public class JwtCreateController {
         if(userEntity == null) {
             User userRequest = User.builder()
                     .username(googleUser.getName())
+                    .username(googleUser.getName())
                     .profileImageUrl(googleUser.getProfileImageUrl())
                     .email(googleUser.getEmail())
                     .provider(googleUser.getProvider())
