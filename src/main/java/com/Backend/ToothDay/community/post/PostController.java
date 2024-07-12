@@ -19,12 +19,10 @@ public class PostController {
         return postService.getAllPostDTO();
     }
 
-//    @GetMapping("/community/{keywordId}")
-//    public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId) {
-//
-//    }
-
-
+    @GetMapping("/community/{keywordId}") //게시글 조회
+    public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId) {
+        return postService.getPostDTOByKeywordId(keywordId);
+    }
 
     @GetMapping("/community/upload") //커뮤니티 작성 화면
     public PostForm communityUploadForm() {
@@ -33,6 +31,7 @@ public class PostController {
 
     @PostMapping("/community/upload") //게시글 작성
     public PostDTO communityUpload(@RequestBody PostForm postForm) {
+        //현재로그인되어있는유저의ID가져오기
         Post post = new Post();
         post.setTitle(postForm.getTitle());
         post.setContent(postForm.getContent());

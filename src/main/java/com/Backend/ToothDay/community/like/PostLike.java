@@ -1,6 +1,7 @@
 package com.Backend.ToothDay.community.like;
 
 import com.Backend.ToothDay.community.post.Post;
+import com.Backend.ToothDay.jwt.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,5 +20,7 @@ public class PostLike {
     @ManyToOne
     private Post post;
 
-    //user
+    @JoinColumn(name = "user_id")
+    @ManyToOne
+    private User user;
 }
