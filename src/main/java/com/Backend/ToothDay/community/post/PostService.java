@@ -23,16 +23,15 @@ public class PostService {
         return postRepository.findAll();
     }
 
-    public List<Post> findByKeywordId(int keywordId) {
-        return postRepository.findByKeywordId(keywordId);
-    }
+//    public List<Post> findByKeywordId(int keywordId) {
+//        return postRepository.findByKeywordId(keywordId);
+//    }
 
     public Post findById(int postId) {
         return postRepository.findById(postId);
     }
 
     public void save(Post post, List<Integer> keywordIds) {
-
         postRepository.save(post, keywordIds);
     }
 
@@ -63,7 +62,6 @@ public class PostService {
             userDTO.setEmail(user.getEmail());
             postDTO.setUser(userDTO);
         }
-        //postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
 
         List<Integer> keywords = post.getPostKeywords().stream()
                 .map(pk -> pk.getKeyword().getId())

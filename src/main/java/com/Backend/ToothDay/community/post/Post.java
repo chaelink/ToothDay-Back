@@ -42,9 +42,4 @@ public class Post {
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostKeyword> postKeywords = new ArrayList<>();
 
-    //public void setKeywords() {
-     //   this.keywords = this.postKeywords.stream()
-       //         .map(pk -> pk.getPostKeywordId().getKeywordId())
-       //         .collect(Collectors.toList());
-   // }
 }
