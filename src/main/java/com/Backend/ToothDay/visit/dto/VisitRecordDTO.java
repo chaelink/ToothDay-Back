@@ -11,11 +11,11 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class VisitRecordDTO {
-    private Long userId;
+//    private Long userId;
     private Integer dentistId;
     private Date visitDate;
     private boolean isShared;
-//    private List<TreatmentDTO> treatmentlist;
+    private List<TreatmentDTO> treatmentlist;
 
     public boolean getIsShared() {
         return isShared;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface DentistRepository extends JpaRepository<Dentist, Integer> {
+public interface DentistRepository extends JpaRepository<Dentist, Long> {
     List<Dentist> findByDentistNameContaining(String query);
 
 }

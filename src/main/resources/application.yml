@@ -33,3 +33,7 @@ spring:
             scope:
               - email
               - profile
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
