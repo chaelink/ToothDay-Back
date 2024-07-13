@@ -1,7 +1,6 @@
 package com.Backend.ToothDay.community.comment;
 
 import com.Backend.ToothDay.community.post.Post;
-import com.Backend.ToothDay.jwt.model.User;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -24,7 +23,5 @@ public class Comment {
 
     private LocalDateTime createDate;
 
-    @JoinColumn(name = "user_id")
-    @ManyToOne
-    private User user;
+    //user
 }
