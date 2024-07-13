@@ -1,7 +1,8 @@
 package com.Backend.ToothDay.community.comment;
 
-import com.Backend.ToothDay.community.post.Post;
+import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.jwt.model.User;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,7 +18,8 @@ public class Comment {
     private long id;
 
     @JoinColumn(name="post_id")
-    @ManyToOne
+    @ManyToOne(fetch=FetchType.EAGER)
+    @JsonBackReference
     private Post post;
 
     private String content;
@@ -27,4 +29,5 @@ public class Comment {
     @JoinColumn(name = "user_id")
     @ManyToOne
     private User user;
+
 }

@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.community.post;
+package com.Backend.ToothDay.community.post.model;
 
 import lombok.Getter;
 import lombok.Setter;
