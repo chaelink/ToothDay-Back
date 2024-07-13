@@ -2,6 +2,8 @@ package com.Backend.ToothDay.visit.model;
 
 
 import com.Backend.ToothDay.jwt.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -48,6 +50,7 @@ public class Visit {
     @JoinColumn(name = "dentist_id", nullable = false)
     private Dentist dentist;
 
-//    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Treatment> treatmentlist;
+    @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<Treatment> treatmentlist;
 }

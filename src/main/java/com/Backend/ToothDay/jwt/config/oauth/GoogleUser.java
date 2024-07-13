@@ -12,7 +12,7 @@ public class GoogleUser implements OAuthUserInfo{
 
     @Override
     public String getProviderId() {
-        return (String)attribute.get("sub");
+        return (String)attribute.get("id");
     }
 
     @Override
@@ -32,7 +32,7 @@ public class GoogleUser implements OAuthUserInfo{
 
     @Override
     public String getProfileImageUrl() {
-        return (String)attribute.get("imageUrl");
+        return (String)attribute.get("picture");
     }
 
 }

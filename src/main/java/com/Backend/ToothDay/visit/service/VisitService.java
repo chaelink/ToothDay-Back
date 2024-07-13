@@ -1,12 +1,15 @@
 package com.Backend.ToothDay.visit.service;
 
+import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import com.Backend.ToothDay.visit.dto.TreatmentDTO;
 import com.Backend.ToothDay.visit.dto.VisitRecordDTO;
-import com.Backend.ToothDay.visit.model.Dentist;
+import com.Backend.ToothDay.visit.model.*;
 //import com.Backend.ToothDay.visit.model.Treatment;
-import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.repository.DentistRepository;
+import com.Backend.ToothDay.visit.repository.ToothNumberRepository;
+import com.Backend.ToothDay.visit.repository.TreatmentRepository;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,13 +18,20 @@ import javax.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class VisitService {
 
     private static final Logger logger = LoggerFactory.getLogger(VisitService.class);
 
     @Autowired
-    private VisitRepository visitRecordRepository;
+    private JwtUtil jwtUtil;
+
+    @Autowired
+    private VisitRepository visitRepository;
 
     @Autowired
     private DentistRepository dentistRepository;
@@ -29,14 +39,23 @@ public class VisitService {
     @Autowired
     private UserRepository userRepository;
 
-    @Transactional
-    public Visit createVisitRecord(VisitRecordDTO visitRecordDTO) {
-        logger.info("DTO Content: {}", visitRecordDTO);
-        User user = userRepository.findById(visitRecordDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    @Autowired
+    private TreatmentRepository treatmentRepository;
 
-        Dentist dentist = dentistRepository.findById(visitRecordDTO.getDentistId())
-                .orElseThrow(() -> new RuntimeException("Dentist not found"));
+    @Autowired
+    private ToothNumberRepository toothNumberRepository;
+
+
+    @Transactional
+    public Visit createVisitRecord(VisitRecordDTO visitRecordDTO, String token) {
+        logger.info("DTO Content: {}", visitRecordDTO);
+
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Dentist dentist = dentistRepository.findById(Long.valueOf(visitRecordDTO.getDentistId()))
+                .orElseThrow(() -> new RuntimeException("치과를 찾을 수 없습니다."));
 
         Visit visit = Visit.builder()
                 .user(user)
@@ -45,8 +64,107 @@ public class VisitService {
                 .isShared(visitRecordDTO.getIsShared())  // 명시적으로 설정
                 .build();
 
+        Visit savedVisit = visitRepository.save(visit);
 
-        Visit savedVisit = visitRecordRepository.save(visit);
+        List<Treatment> treatments = visitRecordDTO.getTreatmentlist().stream().map(dto -> {
+            ToothNumber toothNumber = null;
+            // toothNumber이 필요한 카테고리인지 확인
+            if (!requiresNoToothNumber(dto.getCategory())) { //잇몸이랑 스케일링이면 toothnumber를 null처리
+                toothNumber = toothNumberRepository.findById(dto.getToothId())
+                        .orElseThrow(() -> new RuntimeException("치아 번호를 찾을 수 없습니다."));
+            }
+
+            return Treatment.builder()
+                    .category(Category.valueOf(dto.getCategory()))
+                    .amount(dto.getAmount())
+                    .toothNumber(toothNumber)
+                    .visit(savedVisit)
+                    .build();
+        }).collect(Collectors.toList());
+
+        treatmentRepository.saveAll(treatments);
+        savedVisit.setTreatmentlist(treatments);
+
         return savedVisit;
     }
+
+    private boolean requiresNoToothNumber(String category) {
+        return "잇몸".equals(category) || "스케일링".equals(category);
+    }
+
+    @Transactional
+    public void deleteVisitRecord(Long visitId, String token) {
+        Visit visit = visitRepository.findById(visitId)
+                .orElseThrow(() -> new RuntimeException("진료 기록이 없습니다."));
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        System.out.println("userId = " + userId);
+
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
+        }
+
+        Long visitUserId = visit.getUser().getId();
+
+        if (visitUserId == null || !visitUserId.equals(userId)) {
+            throw new RuntimeException("본인만 게시글 삭제가 가능합니다.");
+        }
+        visitRepository.delete(visit);
+    }
+
+    @Transactional
+    public Visit updateVisitRecord(Long visitId, VisitRecordDTO visitRecordDTO, String token) {
+        Visit visit = visitRepository.findById(visitId)
+                .orElseThrow(() -> new RuntimeException("진료 기록이 없습니다."));
+
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
+        }
+
+        Long visitUserId = visit.getUser().getId();
+
+        if (visitUserId == null || !visitUserId.equals(userId)) {
+            throw new RuntimeException("본인만 게시글 수정이 가능합니다.");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
+
+        Dentist dentist = dentistRepository.findById(Long.valueOf(visitRecordDTO.getDentistId()))
+                .orElseThrow(() -> new RuntimeException("치과를 찾을 수없습니다."));
+
+        visit.setUser(user);
+        visit.setDentist(dentist);
+        visit.setVisitDate(visitRecordDTO.getVisitDate());
+        visit.setShared(visitRecordDTO.getIsShared());
+
+        // Treatments 업데이트
+        List<Treatment> updatedTreatments = new ArrayList<>();
+
+        for (TreatmentDTO dto : visitRecordDTO.getTreatmentlist()) {
+            Treatment treatment = new Treatment();
+            treatment.setVisit(visit);
+            treatment.setCategory(Category.valueOf(dto.getCategory()));
+            treatment.setAmount(dto.getAmount());
+
+            if (!requiresNoToothNumber(dto.getCategory())) {
+                if (dto.getToothId() == null) {
+                    throw new RuntimeException("치아 번호는 필수입니다.");
+                }
+                ToothNumber toothNumber = toothNumberRepository.findById(dto.getToothId())
+                        .orElseThrow(() -> new RuntimeException("치아 번호를 찾을 수 없습니다."));
+                treatment.setToothNumber(toothNumber);
+            }
+
+            updatedTreatments.add(treatment);
+        }
+
+        // 기존 Treatment 삭제 후 새로운 Treatments 저장
+        visit.getTreatmentlist().clear(); // 기존 Treatments 모두 제거
+        visit.getTreatmentlist().addAll(updatedTreatments);
+
+        return visitRepository.save(visit); // 업데이트된 Visit 반환
+
+    }
 }
+
