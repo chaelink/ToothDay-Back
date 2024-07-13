@@ -1,12 +1,15 @@
 package com.Backend.ToothDay.community.post;
 
+import com.Backend.ToothDay.community.post.model.Keyword;
+import com.Backend.ToothDay.community.post.model.Post;
+import com.Backend.ToothDay.community.post.model.PostKeyword;
+import com.Backend.ToothDay.community.post.model.PostKeywordId;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -64,10 +67,5 @@ public class PostRepository {
     public void delete(Post post) {
         em.remove(em.merge(post));
     }
-
-    public Keyword findKeywordById(int keywordId) {
-        return em.find(Keyword.class, keywordId);
-    }
-
 
 }

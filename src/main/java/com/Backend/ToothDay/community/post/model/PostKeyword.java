@@ -1,4 +1,4 @@
-package com.Backend.ToothDay.community.post;
+package com.Backend.ToothDay.community.post.model;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -8,7 +8,6 @@ import javax.persistence.*;
 @Getter @Setter
 @Entity
 public class PostKeyword {
-
 
     @EmbeddedId //복합키를 사용하기 위해 PostKeywordId 선언
     private PostKeywordId postKeywordId;

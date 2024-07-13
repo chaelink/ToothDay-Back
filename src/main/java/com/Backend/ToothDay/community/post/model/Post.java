@@ -1,8 +1,11 @@
-package com.Backend.ToothDay.community.post;
+package com.Backend.ToothDay.community.post.model;
 
 import com.Backend.ToothDay.community.comment.Comment;
+import com.Backend.ToothDay.community.image.Image;
 import com.Backend.ToothDay.community.like.PostLike;
 import com.Backend.ToothDay.jwt.model.User;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,23 +26,23 @@ public class Post {
 
     private String content;
 
-    private String image;
-
     private LocalDateTime createDate;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<Comment> commentList = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post")
-    private List<PostLike> likeList = new ArrayList<>();
+    //@OneToMany(mappedBy = "post")
+    //private List<PostLike> likeList = new ArrayList<>();
 
-
-    //user 정보
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
     private List<PostKeyword> postKeywords = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<Image> imageList= new ArrayList<>();
 
 }
