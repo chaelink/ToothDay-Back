@@ -18,7 +18,7 @@ import java.util.List;
 public class Dentist {
     @Id
     @Column(name = "dentist_id") // 컬럼 이름 지정
-    private Integer dentistId;
+    private long dentistId;
 
     @Column(name = "dentist_name") // 컬럼 이름 지정
     private String dentistName;
