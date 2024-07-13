@@ -3,6 +3,7 @@ package com.Backend.ToothDay.community.like;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
@@ -24,6 +25,16 @@ public class LikeRepository {
         List<PostLike> likes = em.createQuery("select l from PostLike l where l.post.id=:postId", PostLike.class)
                 .setParameter("postId", postId).getResultList();
         return likes.size();
+    }
+
+    public PostLike findByPostIdAndUserId(long postId, long userId) {
+        try {
+            return em.createQuery("select pl from PostLike pl where pl.post.id=:postId and pl.user.id=:userId", PostLike.class)
+                    .setParameter("postId", postId)
+                    .setParameter("userId", userId).getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
 }

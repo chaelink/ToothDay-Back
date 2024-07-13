@@ -3,9 +3,11 @@ package com.Backend.ToothDay.jwt.config.jwt;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+@Component  // 여기에 @Component 추가
 public class JwtUtil {
 
     // 토큰 생성

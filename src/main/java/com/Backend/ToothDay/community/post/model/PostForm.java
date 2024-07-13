@@ -1,7 +1,8 @@
-package com.Backend.ToothDay.community.post;
+package com.Backend.ToothDay.community.post.model;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -10,6 +11,5 @@ import java.util.List;
 public class PostForm {
     private String title;
     private String content;
-    private String image;
     private List<Integer> keywords;
 }

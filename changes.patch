@@ -1,0 +1,238 @@
+diff --git a/src/main/java/com/Backend/ToothDay/community/comment/Comment.java b/src/main/java/com/Backend/ToothDay/community/comment/Comment.java
+index a7e432a..a765dfb 100644
+--- a/src/main/java/com/Backend/ToothDay/community/comment/Comment.java
++++ b/src/main/java/com/Backend/ToothDay/community/comment/Comment.java
+@@ -1,7 +1,6 @@
+ package com.Backend.ToothDay.community.comment;
+ 
+ import com.Backend.ToothDay.community.post.Post;
+-import com.Backend.ToothDay.jwt.model.User;
+ import lombok.Getter;
+ import lombok.Setter;
+ 
+@@ -24,7 +23,5 @@ public class Comment {
+ 
+     private LocalDateTime createDate;
+ 
+-    @JoinColumn(name = "user_id")
+-    @ManyToOne
+-    private User user;
++    //user
+ }
+diff --git a/src/main/java/com/Backend/ToothDay/community/comment/CommentController.java b/src/main/java/com/Backend/ToothDay/community/comment/CommentController.java
+deleted file mode 100644
+index 88fc0bb..0000000
+--- a/src/main/java/com/Backend/ToothDay/community/comment/CommentController.java
++++ /dev/null
+@@ -1,19 +0,0 @@
+-package com.Backend.ToothDay.community.comment;
+-
+-import com.Backend.ToothDay.community.post.PostDTO;
+-import lombok.RequiredArgsConstructor;
+-import org.springframework.stereotype.Repository;
+-import org.springframework.web.bind.annotation.PathVariable;
+-import org.springframework.web.bind.annotation.PostMapping;
+-import org.springframework.web.bind.annotation.RequestParam;
+-import org.springframework.web.bind.annotation.RestController;
+-
+-@RestController
+-@RequiredArgsConstructor
+-public class CommentController {
+-
+-//    @PostMapping("/api/community/{postId}/comment")
+-//    public PostDTO commentUpload(@PathVariable long postId, @RequestParam String content) {
+-//
+-//    }
+-}
+diff --git a/src/main/java/com/Backend/ToothDay/community/like/PostLike.java b/src/main/java/com/Backend/ToothDay/community/like/PostLike.java
+index e385016..59d3abb 100644
+--- a/src/main/java/com/Backend/ToothDay/community/like/PostLike.java
++++ b/src/main/java/com/Backend/ToothDay/community/like/PostLike.java
+@@ -1,7 +1,6 @@
+ package com.Backend.ToothDay.community.like;
+ 
+ import com.Backend.ToothDay.community.post.Post;
+-import com.Backend.ToothDay.jwt.model.User;
+ import lombok.Getter;
+ import lombok.Setter;
+ 
+@@ -20,7 +19,5 @@ public class PostLike {
+     @ManyToOne
+     private Post post;
+ 
+-    @JoinColumn(name = "user_id")
+-    @ManyToOne
+-    private User user;
++    //user
+ }
+diff --git a/src/main/java/com/Backend/ToothDay/community/post/Post.java b/src/main/java/com/Backend/ToothDay/community/post/Post.java
+index 5f55d21..f2e9469 100644
+--- a/src/main/java/com/Backend/ToothDay/community/post/Post.java
++++ b/src/main/java/com/Backend/ToothDay/community/post/Post.java
+@@ -42,4 +42,9 @@ public class Post {
+     @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+     private List<PostKeyword> postKeywords = new ArrayList<>();
+ 
++    //public void setKeywords() {
++     //   this.keywords = this.postKeywords.stream()
++       //         .map(pk -> pk.getPostKeywordId().getKeywordId())
++       //         .collect(Collectors.toList());
++   // }
+ }
+diff --git a/src/main/java/com/Backend/ToothDay/community/post/PostController.java b/src/main/java/com/Backend/ToothDay/community/post/PostController.java
+index 7f6733a..c33d938 100644
+--- a/src/main/java/com/Backend/ToothDay/community/post/PostController.java
++++ b/src/main/java/com/Backend/ToothDay/community/post/PostController.java
+@@ -27,10 +27,12 @@ public class PostController {
+         return postService.getAllPostDTO();
+     }
+ 
+-    @GetMapping("/community/{keywordId}") //게시글 조회
+-    public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId) {
+-        return postService.getPostDTOByKeywordId(keywordId);
+-    }
++//    @GetMapping("/community/{keywordId}")
++//    public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId) {
++//
++//    }
++
++
+ 
+     @GetMapping("/community/upload") //커뮤니티 작성 화면
+     public PostForm communityUploadForm() {
+@@ -38,7 +40,6 @@ public class PostController {
+     }
+ 
+     @PostMapping("/community/upload") //게시글 작성
+-
+     public PostDTO communityUpload(@RequestBody PostForm postForm, HttpServletRequest request) {
+         // JWT 토큰에서 userId 추출
+         String token = request.getHeader("Authorization").replace("Bearer ", "");
+@@ -47,6 +48,7 @@ public class PostController {
+         // userId를 이용하여 User 객체를 가져옵니다.
+         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+ 
++
+         Post post = new Post();
+         post.setTitle(postForm.getTitle());
+         post.setContent(postForm.getContent());
+diff --git a/src/main/java/com/Backend/ToothDay/community/post/PostRepository.java b/src/main/java/com/Backend/ToothDay/community/post/PostRepository.java
+index 285c962..256ded3 100644
+--- a/src/main/java/com/Backend/ToothDay/community/post/PostRepository.java
++++ b/src/main/java/com/Backend/ToothDay/community/post/PostRepository.java
+@@ -6,9 +6,7 @@ import org.springframework.util.CollectionUtils;
+ 
+ import javax.persistence.EntityManager;
+ import javax.persistence.PersistenceContext;
+-import java.util.ArrayList;
+ import java.util.List;
+-import java.util.stream.Collectors;
+ 
+ @Slf4j
+ @Repository
+@@ -19,25 +17,41 @@ public class PostRepository {
+ 
+     public void save(Post post, List<Integer> keywordIds) {
+         em.persist(post);
+-        Keyword keyword = em.find(Keyword.class,1);
+-        PostKeyword postKeyword = new PostKeyword();
+-        PostKeywordId postKeywordId = new PostKeywordId(post.getId(), keyword.getId());
+-        postKeyword.setPostKeywordId(postKeywordId);
+-        postKeyword.setPost(post);
+-        postKeyword.setKeyword(keyword);
+-        em.persist(postKeyword);
+-        post.getPostKeywords().add(postKeyword);
+-        if(!CollectionUtils.isEmpty(keywordIds)) {
++        if(CollectionUtils.isEmpty(keywordIds)) {
++            Keyword keyword = em.find(Keyword.class,1);
++            if (keyword == null) {
++                throw new NullPointerException("Keyword with ID 1 is null");
++            }
++            PostKeyword postKeyword = new PostKeyword();
++            PostKeywordId postKeywordId = new PostKeywordId(post.getId(), keyword.getId());
++            postKeyword.setPostKeywordId(postKeywordId);
++            postKeyword.setPost(post);
++            postKeyword.setKeyword(keyword);
++            em.persist(postKeyword);
++            post.getPostKeywords().add(postKeyword);
++        }
++        else {
++            Keyword keyword1 = em.find(Keyword.class,1);
++            if (keyword1 == null) {
++                throw new NullPointerException("Keyword with ID 1 is null");
++            }
++            PostKeyword postKeyword1 = new PostKeyword();
++            PostKeywordId postKeywordId1 = new PostKeywordId(post.getId(), keyword1.getId());
++            postKeyword1.setPostKeywordId(postKeywordId1);
++            postKeyword1.setPost(post);
++            postKeyword1.setKeyword(keyword1);
++            em.persist(postKeyword1);
++            post.getPostKeywords().add(postKeyword1);
+             for (Integer keywordId : keywordIds) {
+-                Keyword keyword1 = em.find(Keyword.class, keywordId);
+-                if(keyword1 != null) {
+-                    PostKeyword postKeyword1 = new PostKeyword();
+-                    PostKeywordId postKeywordId1 = new PostKeywordId(post.getId(), keywordId);
+-                    postKeyword1.setPostKeywordId(postKeywordId1);
+-                    postKeyword1.setPost(post);
+-                    postKeyword1.setKeyword(keyword1);
+-                    em.persist(postKeyword1);
+-                    post.getPostKeywords().add(postKeyword1);
++                Keyword keyword = em.find(Keyword.class, keywordId);
++                if(keyword != null) {
++                    PostKeyword postKeyword = new PostKeyword();
++                    PostKeywordId postKeywordId = new PostKeywordId(post.getId(), keywordId);
++                    postKeyword.setPostKeywordId(postKeywordId);
++                    postKeyword.setPost(post);
++                    postKeyword.setKeyword(keyword);
++                    em.persist(postKeyword);
++                    post.getPostKeywords().add(postKeyword);
+                 }
+                 else {
+                     throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
+@@ -51,10 +65,9 @@ public class PostRepository {
+     }
+ 
+     public List<Post> findByKeywordId(int keywordId) {
+-         List<PostKeyword> postKeywords = em.createQuery("select e from PostKeyword e where e.keyword.id = :keywordId", PostKeyword.class)
+-                 .setParameter("keywordId", keywordId).getResultList();
+-         List<Post> posts =postKeywords.stream().map(PostKeyword::getPost).collect(Collectors.toList());
+-         return posts;
++         return em.createQuery("select e from PostKeyword e where e.keyword = :keywordId", Post.class)
++                 .setParameter("keywordId", keywordId)
++                 .getResultList();
+     }
+ 
+     public Post findById(long postId) {
+diff --git a/src/main/java/com/Backend/ToothDay/community/post/PostService.java b/src/main/java/com/Backend/ToothDay/community/post/PostService.java
+index ae9860f..7adfa94 100644
+--- a/src/main/java/com/Backend/ToothDay/community/post/PostService.java
++++ b/src/main/java/com/Backend/ToothDay/community/post/PostService.java
+@@ -24,15 +24,16 @@ public class PostService {
+         return postRepository.findAll();
+     }
+ 
+-//    public List<Post> findByKeywordId(int keywordId) {
+-//        return postRepository.findByKeywordId(keywordId);
+-//    }
++    public List<Post> findByKeywordId(int keywordId) {
++        return postRepository.findByKeywordId(keywordId);
++    }
+ 
+     public Post findById(int postId) {
+         return postRepository.findById(postId);
+     }
+ 
+     public void save(Post post, List<Integer> keywordIds) {
++
+         postRepository.save(post, keywordIds);
+     }
+ 
+@@ -63,6 +64,7 @@ public class PostService {
+             userDTO.setEmail(user.getEmail());
+             postDTO.setUser(userDTO);
+         }
++        //postDTO.setKeywords(post.getPostKeywords().stream().map(pk->pk.getKeyword().getKeywordId()).collect(Collectors.toList()));
+ 
+         List<Integer> keywords = post.getPostKeywords().stream()
+                 .map(pk -> pk.getKeyword().getId())

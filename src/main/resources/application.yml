@@ -10,7 +10,7 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://52.78.196.67:3306/toothday
+    url: jdbc:mysql://toothday.c34guoc6ir55.ap-northeast-2.rds.amazonaws.com:3306/toothday
     username: toothuser
     password: 5ToothDay!
 
@@ -33,3 +33,7 @@ spring:
             scope:
               - email
               - profile
+
+  jackson:
+    serialization:
+      fail-on-empty-beans: false
