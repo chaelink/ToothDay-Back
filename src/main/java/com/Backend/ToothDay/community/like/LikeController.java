@@ -25,30 +25,24 @@ public class LikeController {
     private final PostRepository postRepository;
     private final PostService postService;
 
-    @PostMapping("/api/community/{postId}/like")
+    @PostMapping("/api/community/{postId}/like") //게시글 좋아요
     public ResponseEntity<String> like(@PathVariable Long postId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
         Post post = postRepository.findById(postId);
-        PostLike like = new PostLike();
-        like.setUser(user);
-        like.setPost(post);
-        likeService.save(like);
-        return ResponseEntity.ok("Like successful");
-    }
-
-    @DeleteMapping("/api/community/{postId}/like")
-    public ResponseEntity<String> unlike(@PathVariable Long postId, HttpServletRequest request) {
-        String token = request.getHeader("Authorization").replace("Bearer ", "");
-        Long userId = JwtUtil.getUserIdFromToken(token);
-        Post post = postRepository.findById(postId);
-        PostLike like = likeService.findByPostIdAndUserId(postId, userId);
-        if(like!=null) {
-            likeService.delete(like);
-            return ResponseEntity.ok("Like Delete successful");
-        } else {
-            return ResponseEntity.ok("Like not found");
+        PostLike isLiked = likeService.findByPostIdAndUserId(postId, userId);
+        if (isLiked == null) {
+            PostLike postLike = new PostLike();
+            postLike.setPost(post);
+            postLike.setUser(user);
+            likeService.save(postLike);
+            return ResponseEntity.ok("Like successful");
+        }
+        else {
+            likeService.delete(isLiked);
+            return ResponseEntity.ok("Like Deleted successful");
         }
     }
+    
 }

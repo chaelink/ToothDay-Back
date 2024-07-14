@@ -52,12 +52,12 @@ public class PostController {
         return postDTOList;
     }
 
-    @GetMapping("/community/search/{keywordId}") //비유저 게시글 조회
+    @GetMapping("/community/search/{keywordId}") //비유저 게시글목록 조회
     public List<PostDTO> NonLoginCommunityFindByKeywordId(@PathVariable int keywordId) {
         return postService.getPostDTOByKeywordId(keywordId);
     }
 
-    @GetMapping("/api/community/search/{keywordId}") //유저 게시글 조회
+    @GetMapping("/api/community/search/{keywordId}") //유저 게시글목록 조회
     public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
@@ -83,7 +83,9 @@ public class PostController {
     }
 
     @PostMapping("/community/upload") //게시글 작성
-    public PostDTO communityUpload(@RequestPart(value = "postForm") PostForm postForm, @RequestPart(value = "files",required = false) List<MultipartFile> files, HttpServletRequest request) {
+    public PostDTO communityUpload(@RequestPart(value = "postForm") PostForm postForm,
+                                   @RequestPart(value = "files",required = false) List<MultipartFile> files,
+                                   HttpServletRequest request) {
         // JWT 토큰에서 userId 추출
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
@@ -97,7 +99,9 @@ public class PostController {
         post.setCreateDate(LocalDateTime.now());
         post.setUser(user);  // 게시글 작성자 설정
         postService.save(post,postForm.getKeywords());
-        imageService.saveImages(post,files);
+        if(files != null) {
+            imageService.saveImages(post,files);
+        }
         PostDTO postDTO = postService.getPostDTO(post);
         postDTO.setWrittenByCurrentUser(true);
         return postDTO;
@@ -130,18 +134,24 @@ public class PostController {
     }
 
     @PutMapping("/api/community/{postId}") //게시글 수정
-    public PostDTO updatePost(@PathVariable long postId, @RequestPart(value = "postForm") PostForm postForm, @RequestPart(value = "files",required = false) List<MultipartFile> files, HttpServletRequest request) {
+    public PostDTO updatePost(@PathVariable long postId,
+                              @RequestPart(value = "postForm") PostForm postForm, @RequestPart(value = "files",required = false) List<MultipartFile> files,
+                              HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
         Post post = postService.findById(postId);
 
         if(userId.equals(post.getUser().getId())) {
-            post.setTitle(postForm.getTitle());
+            post.setTitle(postForm.getTitle());  //새로운 post 정보 설정
             post.setContent(postForm.getContent());
-            postKeywordRepository.deleteAllByPostId(postId);
+            postKeywordRepository.deleteAllByPostId(postId);  //기존의 postkeyword삭제
             postService.save(post,postForm.getKeywords());
-            imageService.deleteAllByPostId(postId);
-            imageService.saveImages(post,files);
+            if(post.getImageList()!=null) {
+                imageService.deleteAllByPostId(postId);
+            }
+            if(files != null) {
+                imageService.saveImages(post,files);
+            }
             PostDTO postDTO = postService.getPostDTO(post);
             postDTO.setWrittenByCurrentUser(true);
             if(likeService.findByPostIdAndUserId(postId, userId) != null) {

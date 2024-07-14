@@ -10,6 +10,7 @@ import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -69,9 +70,14 @@ public class PostRepository {
     }
 
     public List<Post> findByKeywordId(int keywordId) {
-         return em.createQuery("select e from PostKeyword e where e.keyword = :keywordId", Post.class)
+         List<PostKeyword> postKeywordList = em.createQuery("select e from PostKeyword e where e.keyword.id = :keywordId", PostKeyword.class)
                  .setParameter("keywordId", keywordId)
                  .getResultList();
+         List<Post> postList = new ArrayList<>();
+         for (PostKeyword postKeyword : postKeywordList) {
+             postList.add(em.find(Post.class, postKeyword.getPost().getId()));
+         }
+         return postList;
     }
 
     public Post findById(long postId) {
