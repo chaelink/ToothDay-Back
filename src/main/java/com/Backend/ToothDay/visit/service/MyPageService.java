@@ -44,6 +44,7 @@ public class MyPageService {
         return VisitRecordDTO.builder()
                 .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
                 .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
+                .dentistAddress(visit.getDentist() != null? visit.getDentist().getDentistAddress() : null)
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
                 .treatmentlist(treatmentDTOs)

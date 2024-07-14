@@ -178,8 +178,8 @@ public class VisitService {
     // Visit 객체를 VisitRecordDTO로 변환하는 메서드
     public VisitRecordDTO mapVisitToVisitRecordDTO(Visit visit) {
         VisitRecordDTO visitRecordDTO = VisitRecordDTO.builder()
-                .dentistId(visit.getDentist().getDentistId())
                 .dentistName(visit.getDentist().getDentistName())
+                .dentistAddress(visit.getDentist().getDentistAddress())
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
                 .treatmentlist(mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist()))
