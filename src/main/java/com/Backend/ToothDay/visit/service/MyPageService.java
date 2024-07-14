@@ -23,9 +23,11 @@ public class MyPageService {
         Long userId = jwtUtil.getUserIdFromToken(token);
         List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
 
-        return visits.stream().map(this::convertToDto).collect(Collectors.toList());
+        return visits.stream()
+                .map(visit -> convertToDto(visit, userId))
+                .collect(Collectors.toList());
     }
-    private VisitRecordDTO convertToDto(Visit visit) {
+    private VisitRecordDTO convertToDto(Visit visit, Long userId) {
         List<TreatmentDTO> treatmentDTOs = visit.getTreatmentlist().stream()
                 .map(treatment -> new TreatmentDTO(
                         treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null,
@@ -36,6 +38,8 @@ public class MyPageService {
         int totalAmount = treatmentDTOs.stream()
                 .mapToInt(TreatmentDTO::getAmount)
                 .sum();
+        // 작성자 여부 설정
+        boolean isWrittenByCurrentUser =  visit.getUser() != null && visit.getUser().getId() == userId;
 
         return VisitRecordDTO.builder()
                 .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
@@ -44,6 +48,7 @@ public class MyPageService {
                 .isShared(visit.isShared())
                 .treatmentlist(treatmentDTOs)
                 .totalAmount(totalAmount)
+                .isWrittenByCurrentUser(isWrittenByCurrentUser) // 작성자 여부 추가
                 .build();
     }
 
@@ -61,6 +66,6 @@ public class MyPageService {
             throw new RuntimeException("접근이 거부되었습니다. 본인의 진료 기록만 조회할 수 있습니다.");
         }
 
-        return convertToDto(visit);
+        return convertToDto(visit, userId);
     }
 }

@@ -20,6 +20,7 @@ public class VisitRecordDTO {
     private boolean isShared;
     private List<TreatmentDTO> treatmentlist;
     private Integer totalAmount;
+    private boolean isWrittenByCurrentUser; // 유저가 작성한 진료기록인지 T/F로 받을 수 있는 변수 추가
 
     public boolean getIsShared() {
         return isShared;

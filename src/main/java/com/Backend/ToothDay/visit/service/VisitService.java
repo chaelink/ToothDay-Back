@@ -47,7 +47,7 @@ public class VisitService {
 
 
     @Transactional
-    public Visit createVisitRecord(VisitRecordDTO visitRecordDTO, String token) {
+    public VisitRecordDTO createVisitRecord(VisitRecordDTO visitRecordDTO, String token) {
         logger.info("DTO Content: {}", visitRecordDTO);
 
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -61,15 +61,14 @@ public class VisitService {
                 .user(user)
                 .dentist(dentist)
                 .visitDate(visitRecordDTO.getVisitDate())
-                .isShared(visitRecordDTO.getIsShared())  // 명시적으로 설정
+                .isShared(visitRecordDTO.getIsShared())
                 .build();
 
         Visit savedVisit = visitRepository.save(visit);
 
         List<Treatment> treatments = visitRecordDTO.getTreatmentlist().stream().map(dto -> {
             ToothNumber toothNumber = null;
-            // toothNumber이 필요한 카테고리인지 확인
-            if (!requiresNoToothNumber(dto.getCategory())) { //잇몸이랑 스케일링이면 toothnumber를 null처리
+            if (!requiresNoToothNumber(dto.getCategory())) {
                 toothNumber = toothNumberRepository.findById(dto.getToothId())
                         .orElseThrow(() -> new RuntimeException("치아 번호를 찾을 수 없습니다."));
             }
@@ -85,7 +84,10 @@ public class VisitService {
         treatmentRepository.saveAll(treatments);
         savedVisit.setTreatmentlist(treatments);
 
-        return savedVisit;
+        // isWrittenByCurrentUser 값을 설정
+        boolean isWrittenByCurrentUser = savedVisit.getUser() != null && savedVisit.getUser().getId() == userId;
+        visitRecordDTO.setWrittenByCurrentUser(isWrittenByCurrentUser);
+        return visitRecordDTO;
     }
 
     private boolean requiresNoToothNumber(String category) {
@@ -112,7 +114,7 @@ public class VisitService {
     }
 
     @Transactional
-    public Visit updateVisitRecord(Long visitId, VisitRecordDTO visitRecordDTO, String token) {
+    public VisitRecordDTO updateVisitRecord(Long visitId, VisitRecordDTO visitRecordDTO, String token) {
         Visit visit = visitRepository.findById(visitId)
                 .orElseThrow(() -> new RuntimeException("진료 기록이 없습니다."));
 
@@ -163,8 +165,45 @@ public class VisitService {
         visit.getTreatmentlist().clear(); // 기존 Treatments 모두 제거
         visit.getTreatmentlist().addAll(updatedTreatments);
 
-        return visitRepository.save(visit); // 업데이트된 Visit 반환
+        // isWrittenByCurrentUser 값을 설정
+        boolean isWrittenByCurrentUser =  visit.getUser() != null && visit.getUser().getId() == userId;
+        visitRecordDTO.setWrittenByCurrentUser(isWrittenByCurrentUser);
+
+        // Visit를 저장하고 변환된 VisitRecordDTO를 반환
+        visitRepository.save(visit);
+        return mapVisitToVisitRecordDTO(visit);
 
     }
-}
+
+    // Visit 객체를 VisitRecordDTO로 변환하는 메서드
+    public VisitRecordDTO mapVisitToVisitRecordDTO(Visit visit) {
+        VisitRecordDTO visitRecordDTO = VisitRecordDTO.builder()
+                .dentistId(visit.getDentist().getDentistId())
+                .dentistName(visit.getDentist().getDentistName())
+                .visitDate(visit.getVisitDate())
+                .isShared(visit.isShared())
+                .treatmentlist(mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist()))
+                .isWrittenByCurrentUser(false) // 기본값으로 false 설정
+                .build();
+
+        // isWrittenByCurrentUser 값을 설정
+        if (visit.getUser() != null) {
+            Long userId = visit.getUser().getId();
+            visitRecordDTO.setWrittenByCurrentUser(userId != null && userId.equals(visit.getUser().getId()));
+        }
+
+        return visitRecordDTO;
+    }
+        private List<TreatmentDTO> mapTreatmentListToTreatmentDTOList(List<Treatment> treatments) {
+            return treatments.stream()
+                    .map(treatment -> TreatmentDTO.builder()
+                            .toothId(treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null)
+                            .category(treatment.getCategory().toString())
+                            .amount(treatment.getAmount())
+                            .build())
+                    .collect(Collectors.toList());
+        }
+    }
+
+
 
