@@ -6,6 +6,7 @@ import com.Backend.ToothDay.jwt.dto.UserProfileUpdateRequest;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +37,8 @@ public class UserController {
 
 
     @PutMapping("/api/user/profile")
-    public User updateProfile(@RequestParam(value = "profileImage", required = false) MultipartFile profileImage,
-                              @RequestParam("request") String requestJson,
+    public User updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+                              @RequestPart(value ="request",  required = false) String requestJson,
                               HttpServletRequest httpServletRequest) throws IOException {
         // JWT 토큰에서 userId 추출
         String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
@@ -63,8 +64,9 @@ public class UserController {
 
         // 사용자 이름 수정
         if (requestJson != null) {
-            // JSON 파싱 (Jackson 또는 Gson 라이브러리를 사용할 수 있습니다)
-            UserProfileUpdateRequest request = new ObjectMapper().readValue(requestJson, UserProfileUpdateRequest.class);
+            // JSON 파싱 (Jackson 라이브러리를 사용합니다)
+            ObjectMapper objectMapper = new ObjectMapper();
+            UserProfileUpdateRequest request = objectMapper.readValue(requestJson, UserProfileUpdateRequest.class);
             if (request.getUsername() != null) {
                 user.setUsername(request.getUsername());
             }
@@ -73,5 +75,10 @@ public class UserController {
         userRepository.save(user);
 
         return user;
+    }
+
+    @Data
+    private static class UserProfileUpdateRequest {
+        private String username;
     }
 }
