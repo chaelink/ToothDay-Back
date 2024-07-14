@@ -37,4 +37,11 @@ public class LikeRepository {
         }
     }
 
+    public List<PostLike> findByUserId(long userId) {
+        return em.createQuery("select pl from PostLike pl where pl.user.id=:userId", PostLike.class)
+                .setParameter("userId", userId).getResultList();
+    }
+
+
+
 }
