@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/mypage")
@@ -26,5 +27,11 @@ public class MyPageController {
     public VisitRecordDTO getVisitRecordDetails(@PathVariable Long visitId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return myPageService.getVisitRecordById(visitId, token);
+    }
+
+    @GetMapping("/treatment")
+    public Map<Integer, List<VisitRecordDTO>> getVisitRecordsGroupedByToothId(HttpServletRequest request){
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        return myPageService.getVisitRecordsGroupedByToothId(token);
     }
 }
