@@ -5,6 +5,7 @@ import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.community.post.model.PostKeyword;
 import com.Backend.ToothDay.community.post.model.PostKeywordId;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -82,6 +83,12 @@ public class PostRepository {
 
     public Post findById(long postId) {
         return em.find(Post.class, postId);
+    }
+
+    public List<Post> findByUserId(long userId) {
+        return em.createQuery("select p from Post p where p.user.id = :userId",Post.class)
+                .setParameter("userId",userId)
+                .getResultList();
     }
 
     public void delete(Post post) {

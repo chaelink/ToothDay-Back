@@ -36,4 +36,9 @@ public class CommentRepository {
         return em.find(Comment.class, id);
     }
 
+    public List<Comment> findByUserId(long userId) {
+        return em.createQuery("select c from Comment c where c.user.id = : userId", Comment.class)
+                .setParameter("userId", userId).getResultList();
+    }
+
 }

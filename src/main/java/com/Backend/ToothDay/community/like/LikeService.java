@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @Service
 @Transactional
@@ -26,6 +27,10 @@ public class LikeService {
 
     public PostLike findByPostIdAndUserId(long postId, long userId) {
         return likeRepository.findByPostIdAndUserId(postId, userId);
+    }
+
+    public List<PostLike> findByuserId(long userId) {
+        return likeRepository.findByUserId(userId);
     }
 
 
