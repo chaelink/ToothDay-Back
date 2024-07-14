@@ -1,7 +1,6 @@
 package com.Backend.ToothDay.visit.controller;
 
 import com.Backend.ToothDay.visit.dto.VisitRecordDTO;
-import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.service.VisitService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,10 +16,10 @@ public class VisitController {
     private VisitService visitService;
 
     @PostMapping("/visit")
-    public ResponseEntity<Visit> createVisitRecord(@RequestBody VisitRecordDTO visitRecordDTO, HttpServletRequest request) {
+    public ResponseEntity<VisitRecordDTO> createVisitRecord(@RequestBody VisitRecordDTO visitRecordDTO, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        Visit visit = visitService.createVisitRecord(visitRecordDTO, token);
-        return ResponseEntity.ok(visit);
+        VisitRecordDTO visitDto = visitService.createVisitRecord(visitRecordDTO, token);
+        return ResponseEntity.ok(visitDto);
     }
 
     @DeleteMapping("/visit/{visitId}")
@@ -30,11 +29,11 @@ public class VisitController {
     }
 
     @PutMapping("/visit/{visitId}")
-    public ResponseEntity<Visit> updateVisitRecord(@PathVariable Long visitId,
-                                                   @RequestBody VisitRecordDTO visitRecordDTO,
-                                                   HttpServletRequest request){
+    public ResponseEntity<VisitRecordDTO> updateVisitRecord(@PathVariable Long visitId,
+                                                            @RequestBody VisitRecordDTO visitRecordDTO,
+                                                            HttpServletRequest request){
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        Visit updatedVisit = visitService.updateVisitRecord(visitId, visitRecordDTO, token);
-        return ResponseEntity.ok(updatedVisit);
+        VisitRecordDTO updatedVisitDto = visitService.updateVisitRecord(visitId, visitRecordDTO, token);
+        return ResponseEntity.ok(updatedVisitDto);
     }
 }
