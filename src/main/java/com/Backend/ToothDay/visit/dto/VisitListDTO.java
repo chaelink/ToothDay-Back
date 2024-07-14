@@ -5,15 +5,20 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class VisitListDTO {
-    private String date;
+    private String visitDate;
     private String dentistName;
     private String dentistAddress;
-    private String category;
-    private String amount;
+    private List<TreatmentDTO> treatmentList;
     private Long visitID;
+    private Long userID;
+    private boolean isShared;
+    private Long totalAmount;
+    private boolean writtenByCurrentUser;
 }
