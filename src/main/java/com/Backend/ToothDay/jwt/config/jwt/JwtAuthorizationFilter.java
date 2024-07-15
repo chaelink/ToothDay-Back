@@ -43,9 +43,9 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
         String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
 
-        // JwtUtil을 사용하여 Token에서 UserId 추출
-
+        // JwtUtil을 사용하여 Token에서 Username을 추출
         Long userId = JwtUtil.getUserIdFromToken(token);
+
 
         if (userId != null) {
             User user = userRepository.findById(userId).get();

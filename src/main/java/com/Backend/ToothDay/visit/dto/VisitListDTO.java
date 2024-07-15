@@ -12,13 +12,15 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class VisitListDTO {
-    private String visitDate;
+    private Long dentistId;
     private String dentistName;
     private String dentistAddress;
-    private List<TreatmentDTO> treatmentList;
-    private Long visitID;
-    private Long userID;
+    private String visitDate;
     private boolean isShared;
+    private List<TreatmentDTO> treatmentList;
     private Long totalAmount;
     private boolean writtenByCurrentUser;
+    private Long visitID;
+    private Long userID;
+
 }
