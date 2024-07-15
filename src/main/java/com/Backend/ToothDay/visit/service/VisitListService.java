@@ -25,7 +25,7 @@ public class VisitListService {
     @Autowired
     private VisitRepository visitRepository;
 
-    //진로목록초기화면
+    // 진료 목록 초기 화면
     @Transactional
     public List<VisitListDTO> getAllVisitRecords(String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -34,13 +34,13 @@ public class VisitListService {
         }
 
         List<Visit> userVisits = visitRepository.findByUserId(userId).stream()
-                .sorted(Comparator.comparing(Visit::getVisitDate).reversed())
+                .sorted(Comparator.comparing(Visit::getId).reversed())
                 .limit(1)
                 .collect(Collectors.toList());
 
         List<Visit> allSharedVisits = visitRepository.findByIsShared(true).stream()
                 .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
-                .sorted(Comparator.comparing(Visit::getVisitDate).reversed())
+                .sorted(Comparator.comparing(Visit::getId).reversed())
                 .limit(3)
                 .collect(Collectors.toList());
 
@@ -50,7 +50,8 @@ public class VisitListService {
         userVisitDTOs.addAll(sharedVisitDTOs);
         return userVisitDTOs;
     }
-    //카테고리별 진료목록
+
+    // 카테고리별 진료 목록
     @Transactional
     public List<VisitListDTO> getVisitsByCategories(List<String> categories, String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -61,8 +62,8 @@ public class VisitListService {
         // 현재 사용자가 아닌 사용자 중 isShared가 true인 방문 기록 조회
         List<Visit> allSharedVisits = visitRepository.findByIsShared(true).stream()
                 .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
-                .filter(visit -> visitHasCategory(visit, categories))
-                .sorted(Comparator.comparing(Visit::getVisitDate).reversed()) // 방문 날짜 기준으로 내림차순 정렬
+                .filter(visit -> visitHasCategories(visit, categories))
+                .sorted(Comparator.comparing(Visit::getId).reversed()) // visitId 기준으로 내림차순 정렬
                 //.limit(3) // 갯수제한
                 .collect(Collectors.toList());
 
@@ -72,6 +73,42 @@ public class VisitListService {
         return sharedVisitDTOs;
     }
 
+    // 특정 카테고리의 진료 목록
+    @Transactional
+    public List<VisitListDTO> getVisitsByCategory(String category, String token) {
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
+        }
+
+        // 현재 사용자가 아닌 사용자 중 isShared가 true인 방문 기록 조회
+        List<Visit> allSharedVisits = visitRepository.findByIsShared(true).stream()
+                .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
+                .filter(visit -> visitHasCategory(visit, category))
+                .sorted(Comparator.comparing(Visit::getId).reversed()) // visitId 기준으로 내림차순 정렬
+                .collect(Collectors.toList());
+
+        // 공유된 방문 기록 DTO로 변환
+        List<VisitListDTO> sharedVisitDTOs = convertToVisitListDTOs(allSharedVisits, userId, false);
+
+        return sharedVisitDTOs;
+    }
+    @Transactional
+    public List<VisitListDTO> getAllVisits(String token) {
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
+        }
+
+        // isShared가 true인 모든 방문 기록 조회
+        List<Visit> allSharedVisits = visitRepository.findByIsShared(true).stream()
+                .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
+                .sorted(Comparator.comparing(Visit::getId).reversed()) // visitId 기준으로 내림차순 정렬
+                .collect(Collectors.toList());
+
+        // 공유된 방문 기록 DTO로 변환
+        return convertToVisitListDTOs(allSharedVisits, userId, false);
+    }
     @Transactional
     public VisitListDTO getVisitById(Long visitId, String token) {
         // 토큰에서 유저 아이디 가져오기 (권한 확인 용도)
@@ -94,9 +131,14 @@ public class VisitListService {
         return convertToVisitListDTO(visit, userId, visit.getUser() != null && Objects.equals(visit.getUser().getId(), userId));
     }
 
-    private boolean visitHasCategory(Visit visit, List<String> categories) {
+    private boolean visitHasCategories(Visit visit, List<String> categories) {
         return visit.getTreatmentlist() != null && visit.getTreatmentlist().stream()
                 .anyMatch(treatment -> categories.contains(treatment.getCategory().name()));
+    }
+
+    private boolean visitHasCategory(Visit visit, String category) {
+        return visit.getTreatmentlist() != null && visit.getTreatmentlist().stream()
+                .anyMatch(treatment -> category.equals(treatment.getCategory().name())); // 수정됨
     }
 
     private List<VisitListDTO> convertToVisitListDTOs(List<Visit> visits, Long currentUserId, boolean writtenByCurrentUser) {
