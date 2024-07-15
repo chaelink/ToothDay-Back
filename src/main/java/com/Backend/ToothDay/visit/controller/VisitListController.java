@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -36,4 +37,18 @@ public class VisitListController {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return visitListService.getVisitById(visitId, token);
     }
+
+    @GetMapping("/category/{category}")
+    public List<VisitListDTO> getVisitsByCategory(
+            @PathVariable String category,
+            HttpServletRequest request) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        return visitListService.getVisitsByCategory(category, token);
+    }
+    @GetMapping("/category")
+    public List<VisitListDTO> getAllVisits(HttpServletRequest request) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        return visitListService.getAllVisits(token);
+    }
+
 }
