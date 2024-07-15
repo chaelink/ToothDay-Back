@@ -22,5 +22,5 @@ public class VisitListDTO {
     private boolean writtenByCurrentUser;
     private Long visitID;
     private Long userID;
-
+    private String profileImageUrl;
 }
