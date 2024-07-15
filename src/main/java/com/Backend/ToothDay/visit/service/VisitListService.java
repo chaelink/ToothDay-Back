@@ -1,6 +1,8 @@
 package com.Backend.ToothDay.visit.service;
 
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
+import com.Backend.ToothDay.jwt.model.User;
+import com.Backend.ToothDay.jwt.repository.UserRepository; // UserRepository 추가
 import com.Backend.ToothDay.visit.dto.TreatmentDTO;
 import com.Backend.ToothDay.visit.dto.VisitListDTO;
 import com.Backend.ToothDay.visit.model.Treatment;
@@ -24,6 +26,9 @@ public class VisitListService {
 
     @Autowired
     private VisitRepository visitRepository;
+
+    @Autowired
+    private UserRepository userRepository; // UserRepository 추가
 
     // 진료 목록 초기 화면
     @Transactional
@@ -64,7 +69,6 @@ public class VisitListService {
                 .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
                 .filter(visit -> visitHasCategories(visit, categories))
                 .sorted(Comparator.comparing(Visit::getId).reversed()) // visitId 기준으로 내림차순 정렬
-                //.limit(3) // 갯수제한
                 .collect(Collectors.toList());
 
         // 공유된 방문 기록 DTO로 변환
@@ -93,6 +97,7 @@ public class VisitListService {
 
         return sharedVisitDTOs;
     }
+
     @Transactional
     public List<VisitListDTO> getAllVisits(String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -109,6 +114,7 @@ public class VisitListService {
         // 공유된 방문 기록 DTO로 변환
         return convertToVisitListDTOs(allSharedVisits, userId, false);
     }
+
     @Transactional
     public VisitListDTO getVisitById(Long visitId, String token) {
         // 토큰에서 유저 아이디 가져오기 (권한 확인 용도)
@@ -160,6 +166,7 @@ public class VisitListService {
                 : 0;
 
         Long userId = (visit.getUser() != null) ? visit.getUser().getId() : null;
+        String profileImageUrl = (visit.getUser() != null) ? visit.getUser().getProfileImageUrl() : "정보 없음"; // 추가된 부분
 
         return VisitListDTO.builder()
                 .visitDate(visit.getVisitDate() != null ? visit.getVisitDate().toString() : "정보 없음")
@@ -172,6 +179,7 @@ public class VisitListService {
                 .isShared(currentUserId.equals(userId) ? false : visit.isShared())
                 .totalAmount(totalAmount)
                 .writtenByCurrentUser(writtenByCurrentUser)
+                .profileImageUrl(profileImageUrl) // 추가된 부분
                 .build();
     }
 
