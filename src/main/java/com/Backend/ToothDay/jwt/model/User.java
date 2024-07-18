@@ -2,6 +2,8 @@ package com.Backend.ToothDay.jwt.model;
 
 import javax.persistence.*;
 
+import com.Backend.ToothDay.community.comment.Comment;
+import com.Backend.ToothDay.community.like.PostLike;
 import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.visit.model.Visit;
 import lombok.AllArgsConstructor;
@@ -46,6 +48,12 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Visit> visits;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes;
 
 
     // ENUM으로 안하고 ,로 해서 구분해서 ROLE을 입력 -> 그걸 파싱!!
