@@ -19,18 +19,9 @@ public class KakaoSearchController {
     }
 
     @GetMapping("/search")
-<<<<<<< Updated upstream
-    public ResponseEntity<Object> search(
-            @RequestParam String query,
-            @RequestParam String categoryGroupCode) {
-
-        // Call service to fetch data from Kakao API
-        String result = kakaoApiService.searchPlaces(query, categoryGroupCode);
-=======
     public ResponseEntity<Object> search(@RequestParam String query) {
         // Call service to fetch data from Kakao API
         String result = kakaoApiService.searchPlaces(query);
->>>>>>> Stashed changes
 
         // Return ResponseEntity with JSON body and HTTP status
         return ResponseEntity.status(HttpStatus.OK).body(result);

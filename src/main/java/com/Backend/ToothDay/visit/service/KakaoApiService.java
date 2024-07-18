@@ -5,12 +5,9 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
-<<<<<<< Updated upstream
-=======
 import org.springframework.web.util.UriUtils;
 
 import java.nio.charset.StandardCharsets;
->>>>>>> Stashed changes
 
 @Service
 public class KakaoApiService {
@@ -24,15 +21,6 @@ public class KakaoApiService {
         this.kakaoApiUrl = kakaoApiUrl;
     }
 
-<<<<<<< Updated upstream
-    public String searchPlaces(String query, String categoryGroupCode) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        // Build URL for Kakao API
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(kakaoApiUrl)
-                .queryParam("query", query)
-                .queryParam("category_group_code", categoryGroupCode);
-=======
     public String searchPlaces(String query) {
         RestTemplate restTemplate = new RestTemplate();
 
@@ -42,7 +30,6 @@ public class KakaoApiService {
         // Build URL for Kakao API
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(kakaoApiUrl)
                 .queryParam("query", encodedQuery);
->>>>>>> Stashed changes
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", kakaoApiKey);
