@@ -2,6 +2,8 @@ package com.Backend.ToothDay.jwt.model;
 
 import javax.persistence.*;
 
+import com.Backend.ToothDay.community.post.model.Post;
+import com.Backend.ToothDay.visit.model.Visit;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -37,6 +39,13 @@ public class User {
 
     @CreationTimestamp
     private Timestamp createDate;
+
+    //회원탈퇴 위해 추가한 내용
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Visit> visits;
 
 
     // ENUM으로 안하고 ,로 해서 구분해서 ROLE을 입력 -> 그걸 파싱!!

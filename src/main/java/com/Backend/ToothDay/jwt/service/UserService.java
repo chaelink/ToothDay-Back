@@ -34,17 +34,19 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("유저를 찾을 수 없습니다."));
 
+        userRepository.delete(user);
+
         // 해당 사용자의 방문 기록 삭제
-        visitRepository.deleteAllByUserId(userId);
+        //visitRepository.deleteAllByUserId(userId);
 
         // 해당 사용자의 댓글 삭제
-        commentRepository.deleteAllByUserId(userId);
+        //commentRepository.deleteAllByUserId(userId);
 
         // 해당 사용자의 이미지 삭제
-        imageRepository.deleteAllByUserId(userId);
+        //imageRepository.deleteAllByUserId(userId);
 
         // 사용자 삭제
-        userRepository.delete(user);
+        //userRepository.delete(user);
     }
 }
 

@@ -32,8 +32,8 @@ public class Post {
     @JsonManagedReference
     private List<Comment> commentList = new ArrayList<>();
 
-    //@OneToMany(mappedBy = "post")
-    //private List<PostLike> likeList = new ArrayList<>();
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> likeList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
