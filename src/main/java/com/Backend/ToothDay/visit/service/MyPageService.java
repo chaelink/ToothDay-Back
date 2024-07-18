@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,6 +20,7 @@ public class MyPageService {
 
     @Autowired
     private VisitRepository visitRepository;
+
     public List<VisitRecordDTO> getVisitRecordsForUser(String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
         List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
@@ -27,6 +29,7 @@ public class MyPageService {
                 .map(visit -> convertToDto(visit, userId))
                 .collect(Collectors.toList());
     }
+
     private VisitRecordDTO convertToDto(Visit visit, Long userId) {
         List<TreatmentDTO> treatmentDTOs = visit.getTreatmentlist().stream()
                 .map(treatment -> new TreatmentDTO(
@@ -39,12 +42,12 @@ public class MyPageService {
                 .mapToInt(TreatmentDTO::getAmount)
                 .sum();
         // 작성자 여부 설정
-        boolean isWrittenByCurrentUser =  visit.getUser() != null && visit.getUser().getId() == userId;
+        boolean isWrittenByCurrentUser = visit.getUser() != null && visit.getUser().getId() == userId;
 
         return VisitRecordDTO.builder()
                 .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
                 .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
-                .dentistAddress(visit.getDentist() != null? visit.getDentist().getDentistAddress() : null)
+                .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
                 .treatmentlist(treatmentDTOs)
@@ -68,5 +71,30 @@ public class MyPageService {
         }
 
         return convertToDto(visit, userId);
+    }
+
+    // 새로운 서비스 로직 추가
+    public Map<Integer, List<VisitRecordDTO>> getVisitRecordsGroupedByToothId(String token) {
+        Long userId = jwtUtil.getUserIdFromToken(token);
+        List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
+
+        return visits.stream()
+                .flatMap(visit -> visit.getTreatmentlist().stream()
+                        .map(treatment -> new VisitRecordDTO(
+                                visit.getDentist() != null ? visit.getDentist().getDentistId() : null,
+                                visit.getDentist() != null ? visit.getDentist().getDentistName() : null,
+                                visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null,
+                                visit.getVisitDate(),
+                                visit.isShared(),
+                                List.of(new TreatmentDTO(
+                                        treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null,
+                                        treatment.getCategory() != null ? treatment.getCategory().name() : null,
+                                        treatment.getAmount() != null ? treatment.getAmount() : 0
+                                )),
+                                treatment.getAmount(), // totalAmount
+                                visit.getUser() != null && visit.getUser().getId() == userId // isWrittenByCurrentUser
+                        )))
+                .filter(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId() != null) // toothId가 null인 값을 제외함
+                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId().intValue())); // 그룹화
     }
 }

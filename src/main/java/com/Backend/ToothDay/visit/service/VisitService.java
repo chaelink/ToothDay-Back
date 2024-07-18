@@ -84,9 +84,20 @@ public class VisitService {
         treatmentRepository.saveAll(treatments);
         savedVisit.setTreatmentlist(treatments);
 
+        //totalAmount 설정
+        int totalAmount = treatments.stream()
+                .mapToInt(Treatment::getAmount)
+                .sum();
+
         // isWrittenByCurrentUser 값을 설정
         boolean isWrittenByCurrentUser = savedVisit.getUser() != null && savedVisit.getUser().getId() == userId;
         visitRecordDTO.setWrittenByCurrentUser(isWrittenByCurrentUser);
+
+        // Dentist 정보 설정
+        visitRecordDTO.setDentistName(dentist.getDentistName());
+        visitRecordDTO.setDentistAddress(dentist.getDentistAddress());
+        visitRecordDTO.setTotalAmount(totalAmount);
+
         return visitRecordDTO;
     }
 
@@ -177,12 +188,21 @@ public class VisitService {
 
     // Visit 객체를 VisitRecordDTO로 변환하는 메서드
     public VisitRecordDTO mapVisitToVisitRecordDTO(Visit visit) {
+        List<TreatmentDTO> treatmentDTOs = mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist());
+
+        //totalAmount 계산
+        int totalAmount = treatmentDTOs.stream()
+                .mapToInt(TreatmentDTO::getAmount)
+                .sum();
+
         VisitRecordDTO visitRecordDTO = VisitRecordDTO.builder()
+                .dentistId(visit.getDentist().getDentistId())
                 .dentistName(visit.getDentist().getDentistName())
                 .dentistAddress(visit.getDentist().getDentistAddress())
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
                 .treatmentlist(mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist()))
+                .totalAmount(totalAmount)
                 .isWrittenByCurrentUser(false) // 기본값으로 false 설정
                 .build();
 

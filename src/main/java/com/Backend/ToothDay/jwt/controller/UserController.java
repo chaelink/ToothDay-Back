@@ -5,9 +5,11 @@ import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.dto.UserProfileUpdateRequest;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import com.Backend.ToothDay.jwt.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +23,7 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     // 프로필 조회 API
     @GetMapping("/api/user/profile")
@@ -80,5 +83,16 @@ public class UserController {
     @Data
     private static class UserProfileUpdateRequest {
         private String username;
+    }
+    @DeleteMapping("/api/user/profile")
+    public ResponseEntity<String> deleteUser(HttpServletRequest httpServletRequest) {
+        // JWT 토큰에서 userId 추출
+        String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        // 사용자 및 관련 데이터 삭제
+        userService.deleteUser(userId);
+
+        return ResponseEntity.ok("사용자 및 관련 데이터가 성공적으로 삭제되었습니다.");
     }
 }
