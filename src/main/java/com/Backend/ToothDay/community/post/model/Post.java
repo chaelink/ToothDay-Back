@@ -28,21 +28,21 @@ public class Post {
 
     private LocalDateTime createDate;
 
-    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference
     private List<Comment> commentList = new ArrayList<>();
 
-    //@OneToMany(mappedBy = "post")
-    //private List<PostLike> likeList = new ArrayList<>();
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> likeList = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
-    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post",cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostKeyword> postKeywords = new ArrayList<>();
 
-    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Image> imageList= new ArrayList<>();
 
 }

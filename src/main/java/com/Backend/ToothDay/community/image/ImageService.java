@@ -46,8 +46,4 @@ public class ImageService {
     public void deleteAllByPostId(long postId) {
         imageRepository.deleteAllByPostId(postId);
     }
-
-
-
-
 }

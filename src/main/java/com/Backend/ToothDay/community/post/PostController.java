@@ -174,8 +174,8 @@ public class PostController {
 
         if(userId.equals(post.getUser().getId())) {
             postService.delete(post);
-            postKeywordRepository.deleteAllByPostId(postId);
-            imageService.deleteAllByPostId(postId);
+            //postKeywordRepository.deleteAllByPostId(postId);
+            //imageService.deleteAllByPostId(postId);
             return ResponseEntity.ok("Post deleted successfully");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this post");
