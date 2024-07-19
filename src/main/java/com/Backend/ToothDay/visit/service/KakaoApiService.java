@@ -7,8 +7,6 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import org.springframework.web.util.UriUtils;
 
-import java.nio.charset.StandardCharsets;
-
 @Service
 public class KakaoApiService {
 
@@ -24,12 +22,14 @@ public class KakaoApiService {
     public String searchPlaces(String query) {
         RestTemplate restTemplate = new RestTemplate();
 
-        // Encode query parameter safely for URL
-        String encodedQuery = UriUtils.encode(query, StandardCharsets.UTF_8);
-
         // Build URL for Kakao API
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(kakaoApiUrl)
-                .queryParam("query", encodedQuery);
+                .queryParam("query", query);
+
+        String uriString = builder.toUriString();
+
+        // Decode the URI string
+        String decodedUriString = UriUtils.decode(uriString, "UTF-8");
 
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", kakaoApiKey);
@@ -37,11 +37,12 @@ public class KakaoApiService {
 
         // Make HTTP GET request to Kakao API
         ResponseEntity<String> response = restTemplate.exchange(
-                builder.toUriString(),
+                decodedUriString,
                 HttpMethod.GET,
                 entity,
                 String.class
         );
+        System.out.println(decodedUriString);
 
         // Return the response body
         return response.getBody();
