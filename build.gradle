@@ -35,6 +35,7 @@ dependencies {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
 	}
 	testImplementation 'org.springframework.security:spring-security-test'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
 }
 test {
 	useJUnitPlatform()

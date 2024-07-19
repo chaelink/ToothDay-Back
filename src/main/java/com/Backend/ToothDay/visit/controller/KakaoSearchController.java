@@ -1,12 +1,13 @@
 package com.Backend.ToothDay.visit.controller;
 
 import com.Backend.ToothDay.visit.service.KakaoApiService;
+import com.Backend.ToothDay.visit.service.KakaoApiService.PlaceInfo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class KakaoSearchController {
@@ -19,11 +20,7 @@ public class KakaoSearchController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<Object> search(@RequestParam String query) {
-        // Call service to fetch data from Kakao API
-        String result = kakaoApiService.searchPlaces(query);
-
-        // Return ResponseEntity with JSON body and HTTP status
-        return ResponseEntity.status(HttpStatus.OK).body(result);
+    public List<PlaceInfo> searchPlaces(@RequestParam String query) {
+        return kakaoApiService.searchPlaces(query);
     }
 }
