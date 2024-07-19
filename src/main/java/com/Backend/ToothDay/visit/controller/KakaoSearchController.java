@@ -19,7 +19,7 @@ public class KakaoSearchController {
         this.kakaoApiService = kakaoApiService;
     }
 
-    @GetMapping("/search")
+    @GetMapping("/dentists/search")
     public List<PlaceInfo> searchPlaces(@RequestParam String query) {
         return kakaoApiService.searchPlaces(query);
     }
