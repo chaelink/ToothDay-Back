@@ -24,7 +24,8 @@ public class KakaoApiService {
 
         // Build URL for Kakao API
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(kakaoApiUrl)
-                .queryParam("query", query);
+                .queryParam("query", query)
+                .queryParam("category_group_code", "HP8");
 
         String uriString = builder.toUriString();
 
