@@ -1,6 +1,7 @@
 package com.Backend.ToothDay.jwt.config.jwt;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -47,17 +48,28 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         Long userId = JwtUtil.getUserIdFromToken(token);
 
 
+        // User ID가 null이 아닌 경우에만 처리
         if (userId != null) {
-            User user = userRepository.findById(userId).get();
+            Optional<User> optionalUser = userRepository.findById(userId);
 
-            PrincipalDetails principalDetails = new PrincipalDetails(user);
-            Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
-                    null,
-                    principalDetails.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            // User가 존재할 경우, 인증 처리
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                PrincipalDetails principalDetails = new PrincipalDetails(user);
+                Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
+                        null,
+                        principalDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } else {
+                // User가 존재하지 않을 경우, 적절한 로그 처리 또는 예외 처리
+                System.out.println("User not found with ID: " + userId);
+                // 예를 들어, 인증 실패 응답을 반환할 수 있음
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                return;
+            }
         }
 
+        // 다음 필터로 이동
         chain.doFilter(request, response);
     }
 }
