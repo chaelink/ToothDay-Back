@@ -1,5 +1,6 @@
 package com.Backend.ToothDay.community.post.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,5 +20,6 @@ public class Keyword {
     private KeywordName keywordName;
 
     @OneToMany(mappedBy = "keyword",cascade = CascadeType.ALL)   //꼭 필요한가?
+    @JsonIgnore // 순환 참조 방지
     private List<PostKeyword> postKeywords = new ArrayList<>();
 }

@@ -1,6 +1,7 @@
 package com.Backend.ToothDay.community.image;
 
 import com.Backend.ToothDay.community.post.model.Post;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,6 +17,7 @@ public class Image {
 
     @JoinColumn(name = "post_id")
     @ManyToOne
+    @JsonBackReference //순환참조 방지
     private Post post;
 
     private String imageUrl;

@@ -2,6 +2,7 @@ package com.Backend.ToothDay.visit.model;
 
 
 import com.Backend.ToothDay.jwt.model.User;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -44,6 +45,7 @@ public class Visit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @JsonIgnore // 순환 참조 방지
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,6 +53,6 @@ public class Visit {
     private Dentist dentist;
 
     @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference // 순환 참조 방지
     private List<Treatment> treatmentlist;
 }
