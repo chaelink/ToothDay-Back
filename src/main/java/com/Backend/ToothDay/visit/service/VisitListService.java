@@ -144,7 +144,7 @@ public class VisitListService {
 
     private boolean visitHasCategory(Visit visit, String category) {
         return visit.getTreatmentlist() != null && visit.getTreatmentlist().stream()
-                .anyMatch(treatment -> category.equals(treatment.getCategory().name())); // 수정됨
+                .anyMatch(treatment -> category.contains(treatment.getCategory().name())); // 수정됨
     }
 
     private List<VisitListDTO> convertToVisitListDTOs(List<Visit> visits, Long currentUserId, boolean writtenByCurrentUser) {

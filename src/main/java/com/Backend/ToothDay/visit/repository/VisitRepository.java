@@ -11,5 +11,6 @@ import java.util.List;
 public interface VisitRepository extends JpaRepository<Visit, Long> {
     List<Visit> findByUserId(Long userId);
     List<Visit> findByIsShared(Boolean isShared);
-// 사용자 ID로 방문 기록을 찾는 메서드 추가
+
+    void deleteAllByUserId(Long userId);
 }

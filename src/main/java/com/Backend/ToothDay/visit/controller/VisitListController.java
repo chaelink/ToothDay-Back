@@ -45,7 +45,7 @@ public class VisitListController {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return visitListService.getVisitsByCategory(category, token);
     }
-    @GetMapping("/category")
+    @GetMapping("/category/전체")
     public List<VisitListDTO> getAllVisits(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return visitListService.getAllVisits(token);

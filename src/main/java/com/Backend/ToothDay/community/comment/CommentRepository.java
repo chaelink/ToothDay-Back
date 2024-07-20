@@ -40,5 +40,8 @@ public class CommentRepository {
         return em.createQuery("select c from Comment c where c.user.id = : userId", Comment.class)
                 .setParameter("userId", userId).getResultList();
     }
-
+    public void deleteAllByUserId(long userId) {
+        em.createQuery("delete from Comment c where c.user.id = :userId")
+                .setParameter("userId", userId).executeUpdate();
+    }
 }

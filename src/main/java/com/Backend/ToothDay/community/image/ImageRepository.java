@@ -20,4 +20,9 @@ public class ImageRepository {
         em.createQuery("delete from Image i where i.post.id = :postId")
                 .setParameter("postId", postId).executeUpdate();
     }
+    public void deleteAllByUserId(long userId) {
+        em.createQuery("delete from Image i where i.post.user.id = :userId")
+                .setParameter("userId", userId)
+                .executeUpdate();
+    }
 }

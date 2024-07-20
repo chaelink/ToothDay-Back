@@ -2,12 +2,15 @@ package com.Backend.ToothDay.jwt.controller;
 
 
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
+import com.Backend.ToothDay.jwt.dto.UserDTO;
 import com.Backend.ToothDay.jwt.dto.UserProfileUpdateRequest;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import com.Backend.ToothDay.jwt.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,10 +24,11 @@ public class UserController {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     // 프로필 조회 API
     @GetMapping("/api/user/profile")
-    public User getProfile(HttpServletRequest httpServletRequest) {
+    public UserDTO getProfile(HttpServletRequest httpServletRequest) {
         // JWT 토큰에서 userId 추출
         String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -32,12 +36,12 @@ public class UserController {
         // userId를 이용하여 User 객체를 가져옵니다.
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
 
-        return user;
+        return UserDTO.from(user);
     }
 
 
     @PutMapping("/api/user/profile")
-    public User updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+    public UserDTO updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                               @RequestPart(value ="request",  required = false) String requestJson,
                               HttpServletRequest httpServletRequest) throws IOException {
         // JWT 토큰에서 userId 추출
@@ -74,11 +78,22 @@ public class UserController {
         // 수정된 User 객체를 저장합니다.
         userRepository.save(user);
 
-        return user;
+        return UserDTO.from(user);
     }
 
     @Data
     private static class UserProfileUpdateRequest {
         private String username;
+    }
+    @DeleteMapping("/api/user/profile")
+    public ResponseEntity<String> deleteUser(HttpServletRequest httpServletRequest) {
+        // JWT 토큰에서 userId 추출
+        String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        // 사용자 및 관련 데이터 삭제
+        userService.deleteUser(userId);
+
+        return ResponseEntity.ok("사용자 및 관련 데이터가 성공적으로 삭제되었습니다.");
     }
 }

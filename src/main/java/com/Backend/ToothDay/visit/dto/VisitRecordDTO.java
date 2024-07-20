@@ -14,10 +14,11 @@ import java.util.List;
 @Builder
 public class VisitRecordDTO {
 //    private Long userId;
+    private Long visitId; //visitId필드 추가
     private Long dentistId;
     private String dentistName;  // 치과 이름 필드 추가
     private String dentistAddress;
-    private Date visitDate;
+    private String visitDate;
     private boolean isShared;
     private List<TreatmentDTO> treatmentlist;
     private Integer totalAmount;
