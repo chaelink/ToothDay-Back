@@ -73,10 +73,11 @@ public class KakaoApiService {
             JsonNode documents = root.path("documents");
 
             for (JsonNode node : documents) {
-                String addressName = node.path("address_name").asText();
-                String placeName = node.path("place_name").asText();
-                String id = node.path("id").asText();
-                placeInfoList.add(new PlaceInfo(addressName, placeName, id));
+                String dentistAddress = node.path("address_name").asText();
+                String dentistName = node.path("place_name").asText();
+                String dentistId = node.path("id").asText();
+                dentistAddress = dentistAddress.replaceAll("(동)([^\\d]*)\\d.*", "$1$2");
+                placeInfoList.add(new PlaceInfo(dentistAddress, dentistName, dentistId));
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -88,9 +89,9 @@ public class KakaoApiService {
     private void savePlacesToDatabase(List<PlaceInfo> placeInfoList) {
         for (PlaceInfo placeInfo : placeInfoList) {
             Dentist dentist = Dentist.builder()
-                    .dentistId(Long.parseLong(placeInfo.getId())) // id가 고유하고 올바르게 파싱되었는지 확인
-                    .dentistName(placeInfo.getPlaceName())
-                    .dentistAddress(placeInfo.getAddressName())
+                    .dentistId(Long.parseLong(placeInfo.getDentistId())) // id가 고유하고 올바르게 파싱되었는지 확인
+                    .dentistName(placeInfo.getDentistName())
+                    .dentistAddress(placeInfo.getDentistAddress())
                     .build();
 
             dentistRepository.save(dentist);
@@ -100,46 +101,46 @@ public class KakaoApiService {
     // 내부 클래스: 장소 정보
     public static class PlaceInfo {
 
-        private String id;
-        private String placeName;
-        private String addressName;
+        private String dentistId;
+        private String dentistName;
+        private String dentistAddress;
 
-        public PlaceInfo(String addressName, String placeName, String id) {
-            this.addressName = addressName;
-            this.placeName = placeName;
-            this.id = id;
+        public PlaceInfo(String dentistAddress, String dentistName, String dentistId) {
+            this.dentistAddress = dentistAddress;
+            this.dentistName = dentistName;
+            this.dentistId = dentistId;
         }
 
-        public String getAddressName() {
-            return addressName;
+        public String getDentistAddress() {
+            return dentistAddress;
         }
 
-        public void setAddressName(String addressName) {
-            this.addressName = addressName;
+        public void setDentistAddress(String dentistAddress) {
+            this.dentistAddress = dentistAddress;
         }
 
-        public String getPlaceName() {
-            return placeName;
+        public String getDentistName() {
+            return dentistName;
         }
 
-        public void setPlaceName(String placeName) {
-            this.placeName = placeName;
+        public void setDentistName(String dentistName) {
+            this.dentistName = dentistName;
         }
 
-        public String getId() {
-            return id;
+        public String getDentistId() {
+            return dentistId;
         }
 
-        public void setId(String id) {
-            this.id = id;
+        public void setDentistId(String dentistId) {
+            this.dentistId = dentistId;
         }
 
         @Override
         public String toString() {
             return "PlaceInfo{" +
-                    "addressName='" + addressName + '\'' +
-                    ", placeName='" + placeName + '\'' +
-                    ", id='" + id + '\'' +
+                    "dentistAddress='" + dentistAddress + '\'' +
+                    ", dentistName='" + dentistName + '\'' +
+                    ", dentistId='" + dentistId + '\'' +
                     '}';
         }
     }
