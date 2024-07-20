@@ -46,7 +46,7 @@ public class VisitListService {
         List<Visit> allSharedVisits = visitRepository.findByIsShared(true).stream()
                 .filter(visit -> visit.getUser() != null && !Objects.equals(visit.getUser().getId(), userId))
                 .sorted(Comparator.comparing(Visit::getId).reversed())
-                .limit(3)
+                //.limit(3)
                 .collect(Collectors.toList());
 
         List<VisitListDTO> userVisitDTOs = convertToVisitListDTOs(userVisits, userId, true);
