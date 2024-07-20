@@ -33,8 +33,8 @@ public class Visit {
     // private String dentistName;
     // private String dentistAddress;
 
-    @Temporal(TemporalType.DATE)
-    private Date visitDate;
+    @Column(name = "visit_date")
+    private String visitDate;
 
     @Column(name = "is_shared")
     @JsonProperty("shared")
