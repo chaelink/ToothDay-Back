@@ -42,10 +42,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
                 .authorizeRequests()
-                // 로그인하지 않은 사용자도 접근할 수 있는 URL 설정
-                .antMatchers("/community", "/community/search/{keywordId}", "/community/{postId}").permitAll()
-                // 그 외의 모든 요청은 인증이 필요함
-                .anyRequest().authenticated();
-                //.requiresChannel().anyRequest().requiresSecure(); // HTTPS 강제 => 배포할 때 수정
+                .anyRequest().permitAll();
+        //.requiresChannel().anyRequest().requiresSecure(); // HTTPS 강제 => 배포할 때 수정
     }
 }

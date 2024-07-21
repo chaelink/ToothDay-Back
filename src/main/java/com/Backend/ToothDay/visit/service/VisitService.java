@@ -222,16 +222,15 @@ public class VisitService {
 
         return visitRecordDTO;
     }
-        private List<TreatmentDTO> mapTreatmentListToTreatmentDTOList(List<Treatment> treatments) {
-            return treatments.stream()
-                    .map(treatment -> TreatmentDTO.builder()
-                            .toothId(treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null)
-                            .category(treatment.getCategory().toString())
-                            .amount(treatment.getAmount())
-                            .build())
-                    .collect(Collectors.toList());
-        }
+    private List<TreatmentDTO> mapTreatmentListToTreatmentDTOList(List<Treatment> treatments) {
+        return treatments.stream()
+                .map(treatment -> TreatmentDTO.builder()
+                        .toothId(treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null)
+                        .category(treatment.getCategory().toString())
+                        .amount(treatment.getAmount())
+                        .build())
+                .collect(Collectors.toList());
     }
-
+}
 
 
