@@ -20,7 +20,7 @@ public class VisitListDTO {
     private List<TreatmentDTO> treatmentList;
     private Long totalAmount;
     private boolean writtenByCurrentUser;
-    private Long visitID;
-    private Long userID;
+    private Long visitId;
+    private Long userId;
     private String profileImageUrl;
 }
