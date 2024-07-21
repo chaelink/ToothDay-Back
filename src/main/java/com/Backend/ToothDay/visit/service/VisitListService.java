@@ -186,7 +186,7 @@ public class VisitListService {
                 .treatmentList(treatmentDTOList)
                 .visitId(visit.getId())
                 .userId(userId)
-                .isShared(currentUserId.equals(userId) ? false : visit.isShared())
+                .isShared(visit.isShared())
                 .totalAmount(totalAmount)
                 .writtenByCurrentUser(writtenByCurrentUser)
                 .profileImageUrl(profileImageUrl) // 추가된 부분
