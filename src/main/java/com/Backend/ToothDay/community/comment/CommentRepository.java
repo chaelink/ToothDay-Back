@@ -36,12 +36,12 @@ public class CommentRepository {
         return em.find(Comment.class, id);
     }
 
-    public List<Comment> findByUserId(long userId) {
+    public List<Comment> findByUserIdPaging(long userId, int limit, int offset) {
         return em.createQuery("select c from Comment c where c.user.id = : userId", Comment.class)
-                .setParameter("userId", userId).getResultList();
+                .setParameter("userId", userId)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
-    public void deleteAllByUserId(long userId) {
-        em.createQuery("delete from Comment c where c.user.id = :userId")
-                .setParameter("userId", userId).executeUpdate();
-    }
+
 }
