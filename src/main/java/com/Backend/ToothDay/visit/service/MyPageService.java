@@ -7,7 +7,9 @@ import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,9 +23,13 @@ public class MyPageService {
     @Autowired
     private VisitRepository visitRepository;
 
-    public List<VisitRecordDTO> getVisitRecordsForUser(String token) {
+    public List<VisitRecordDTO> getVisitRecordsForUser(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
-        List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        // 페이지 처리: offset과 limit을 사용하여 데이터 조회
+        List<Visit> visits = visitRepository.findByUserId(userId, pageable);
 
         return visits.stream()
                 .map(visit -> convertToDto(visit, userId))
