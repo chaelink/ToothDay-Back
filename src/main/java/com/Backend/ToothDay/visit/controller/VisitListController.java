@@ -17,17 +17,22 @@ public class VisitListController {
     private VisitListService visitListService;
 
     @GetMapping
-    public List<VisitListDTO> getAllVisitRecords(HttpServletRequest request) {
+    public List<VisitListDTO> getAllVisitRecords(
+            @RequestParam(value = "offset", defaultValue = "0")int offset,
+            @RequestParam(value = "limit", defaultValue = "10")int limit,
+            HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getAllVisitRecords(token);
+        return visitListService.getAllVisitRecords(token, offset, limit);
     }
 
     @GetMapping("/categories")
     public List<VisitListDTO> getVisitsByCategories(
             @RequestParam List<String> categories,
+            @RequestParam(value = "offset", defaultValue = "0")int offset,
+            @RequestParam(value = "limit", defaultValue = "10")int limit,
             HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getVisitsByCategories(categories, token);
+        return visitListService.getVisitsByCategories(categories, token, offset, limit);
     }
 
     @GetMapping("/{visitId}")
@@ -41,14 +46,19 @@ public class VisitListController {
     @GetMapping("/category/{category}")
     public List<VisitListDTO> getVisitsByCategory(
             @PathVariable String category,
+            @RequestParam(value = "offset", defaultValue = "0")int offset,
+            @RequestParam(value = "limit", defaultValue = "10")int limit,
             HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getVisitsByCategory(category, token);
+        return visitListService.getVisitsByCategory(category, token, offset, limit);
     }
     @GetMapping("/category/전체")
-    public List<VisitListDTO> getAllVisits(HttpServletRequest request) {
+    public List<VisitListDTO> getAllVisits(
+            @RequestParam(value = "offset", defaultValue = "0")int offset,
+            @RequestParam(value = "limit", defaultValue = "10")int limit,
+            HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getAllVisits(token);
+        return visitListService.getAllVisits(token, offset, limit);
     }
 
 }

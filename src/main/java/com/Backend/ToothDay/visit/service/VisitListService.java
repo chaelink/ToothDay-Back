@@ -32,7 +32,7 @@ public class VisitListService {
 
     // 진료 목록 초기 화면
     @Transactional
-    public List<VisitListDTO> getAllVisitRecords(String token) {
+    public List<VisitListDTO> getAllVisitRecords(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
         if (userId == null) {
             throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
@@ -53,12 +53,15 @@ public class VisitListService {
         List<VisitListDTO> sharedVisitDTOs = convertToVisitListDTOs(allSharedVisits, userId, false);
 
         userVisitDTOs.addAll(sharedVisitDTOs);
-        return userVisitDTOs;
+        int fromIndex = offset;
+        int toIndex = Math.min(offset + limit, userVisitDTOs.size());
+
+        return userVisitDTOs.subList(fromIndex, toIndex);
     }
 
     // 카테고리별 진료 목록
     @Transactional
-    public List<VisitListDTO> getVisitsByCategories(List<String> categories, String token) {
+    public List<VisitListDTO> getVisitsByCategories(List<String> categories, String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
         if (userId == null) {
             throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
@@ -74,12 +77,14 @@ public class VisitListService {
         // 공유된 방문 기록 DTO로 변환
         List<VisitListDTO> sharedVisitDTOs = convertToVisitListDTOs(allSharedVisits, userId, false);
 
-        return sharedVisitDTOs;
+        int fromIndex = offset;
+        int toIndex = Math.min(offset + limit, sharedVisitDTOs.size());
+        return sharedVisitDTOs.subList(fromIndex, toIndex);
     }
 
     // 특정 카테고리의 진료 목록
     @Transactional
-    public List<VisitListDTO> getVisitsByCategory(String category, String token) {
+    public List<VisitListDTO> getVisitsByCategory(String category, String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
         if (userId == null) {
             throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
@@ -95,11 +100,13 @@ public class VisitListService {
         // 공유된 방문 기록 DTO로 변환
         List<VisitListDTO> sharedVisitDTOs = convertToVisitListDTOs(allSharedVisits, userId, false);
 
-        return sharedVisitDTOs;
+        int fromIndex = offset;
+        int toIndex = Math.min(offset + limit, sharedVisitDTOs.size());
+        return sharedVisitDTOs.subList(fromIndex, toIndex);
     }
 
     @Transactional
-    public List<VisitListDTO> getAllVisits(String token) {
+    public List<VisitListDTO> getAllVisits(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
         if (userId == null) {
             throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
@@ -112,7 +119,10 @@ public class VisitListService {
                 .collect(Collectors.toList());
 
         // 공유된 방문 기록 DTO로 변환
-        return convertToVisitListDTOs(allSharedVisits, userId, false);
+        List<VisitListDTO> sharedVisitDTOs =convertToVisitListDTOs(allSharedVisits, userId, false);
+        int fromIndex = offset;
+        int toIndex = Math.min(offset + limit, sharedVisitDTOs.size());
+        return sharedVisitDTOs.subList(fromIndex, toIndex);
     }
 
     @Transactional
@@ -174,8 +184,8 @@ public class VisitListService {
                 .dentistName(dentistName)
                 .dentistAddress(dentistAddress)
                 .treatmentList(treatmentDTOList)
-                .visitID(visit.getId())
-                .userID(userId)
+                .visitId(visit.getId())
+                .userId(userId)
                 .isShared(currentUserId.equals(userId) ? false : visit.isShared())
                 .totalAmount(totalAmount)
                 .writtenByCurrentUser(writtenByCurrentUser)
