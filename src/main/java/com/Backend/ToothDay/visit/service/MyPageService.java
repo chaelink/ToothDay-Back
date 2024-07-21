@@ -57,7 +57,7 @@ public class MyPageService {
                 .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
-                .treatmentlist(treatmentDTOs)
+                .treatmentList(treatmentDTOs)
                 .totalAmount(totalAmount)
                 .isWrittenByCurrentUser(isWrittenByCurrentUser) // 작성자 여부 추가
                 .build();
@@ -94,7 +94,7 @@ public class MyPageService {
                                 .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
                                 .visitDate(visit.getVisitDate())
                                 .isShared(visit.isShared())
-                                .treatmentlist(List.of(new TreatmentDTO(
+                                .treatmentList(List.of(new TreatmentDTO(
                                         treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null,
                                         treatment.getCategory() != null ? treatment.getCategory().name() : null,
                                         treatment.getAmount() != null ? treatment.getAmount() : 0
@@ -102,7 +102,7 @@ public class MyPageService {
                                 .totalAmount(treatment.getAmount())
                                 .isWrittenByCurrentUser(visit.getUser() != null && visit.getUser().getId() == (userId))
                                 .build()))
-                .filter(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId() != null) // toothId가 null인 값을 제외함
-                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId().intValue())); // 그룹화
+                .filter(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId() != null) // toothId가 null인 값을 제외함
+                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId().intValue())); // 그룹화
     }
     }
