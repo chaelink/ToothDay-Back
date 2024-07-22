@@ -105,4 +105,4 @@ public class MyPageService {
                 .filter(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId() != null) // toothId가 null인 값을 제외함
                 .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId().intValue())); // 그룹화
     }
-    }
+}
