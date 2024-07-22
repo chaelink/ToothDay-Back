@@ -6,6 +6,7 @@ import com.Backend.ToothDay.community.comment.Comment;
 import com.Backend.ToothDay.community.like.PostLike;
 import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.visit.model.Visit;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -44,15 +45,19 @@ public class User {
 
     //회원탈퇴 위해 추가한 내용
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // 순환 참조 방지
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // 순환 참조 방지
     private List<Visit> visits;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // 순환 참조 방지
     private List<Comment> comments;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // 순환 참조 방지
     private List<PostLike> postLikes;
 
 

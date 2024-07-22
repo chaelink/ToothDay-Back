@@ -27,16 +27,19 @@ public class PostController {
     private final ImageService imageService;
     private final LikeService likeService;
 
-    @GetMapping("/community") //비유저 커뮤니티 첫화면
-    public List<PostDTO> NonLoginCommunityMain() {
-        return postService.getAllPostDTO();
+    @GetMapping("/community") //비유저 커뮤니티 첫화면 페이징
+    public List<PostDTO> NonLoginCommunityMain(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                               @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return postService.getAllPostDTOPaging(limit, offset);
     }
 
-    @GetMapping("/api/community") //유저 커뮤니티 첫화면
-    public List<PostDTO> communityMain(HttpServletRequest request) {
+    @GetMapping("/api/community") //유저 커뮤니티 첫화면 페이징
+    public List<PostDTO> communityMain(HttpServletRequest request,
+                                       @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                       @RequestParam(value = "limit", defaultValue = "10") int limit) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
-        List<PostDTO> postDTOList = postService.getAllPostDTO();
+        List<PostDTO> postDTOList = postService.getAllPostDTOPaging(limit, offset);
         for (PostDTO postDTO : postDTOList) {
             if(likeService.findByPostIdAndUserId(postDTO.getPostId(), userId) != null) {
                 postDTO.setLikedByCurrentUser(true);
@@ -52,16 +55,21 @@ public class PostController {
         return postDTOList;
     }
 
-    @GetMapping("/community/search/{keywordId}") //비유저 게시글목록 조회
-    public List<PostDTO> NonLoginCommunityFindByKeywordId(@PathVariable int keywordId) {
-        return postService.getPostDTOByKeywordId(keywordId);
+    @GetMapping("/community/search/{keywordId}") //비유저 게시글목록 조회 페이징
+    public List<PostDTO> NonLoginCommunityFindByKeywordId(@PathVariable int keywordId,
+                                                          @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                                          @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return postService.getPostDTOByKeywordIdPaging(keywordId,limit,offset);
     }
 
-    @GetMapping("/api/community/search/{keywordId}") //유저 게시글목록 조회
-    public List<PostDTO> communityFindByKeywordId(@PathVariable int keywordId, HttpServletRequest request) {
+    @GetMapping("/api/community/search/{keywordId}") //유저 게시글목록 조회 페이징
+    public List<PostDTO> communityFindByKeywordIdPaging(@PathVariable int keywordId,
+                                                  HttpServletRequest request,
+                                                  @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                                   @RequestParam(value = "limit", defaultValue = "10") int limit) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
-        List<PostDTO> postDTOList = postService.getPostDTOByKeywordId(keywordId);
+        List<PostDTO> postDTOList = postService.getPostDTOByKeywordIdPaging(keywordId, limit, offset);
         for (PostDTO postDTO : postDTOList) {
             if(likeService.findByPostIdAndUserId(postDTO.getPostId(), userId) != null) {
                 postDTO.setLikedByCurrentUser(true);
@@ -174,8 +182,6 @@ public class PostController {
 
         if(userId.equals(post.getUser().getId())) {
             postService.delete(post);
-            //postKeywordRepository.deleteAllByPostId(postId);
-            //imageService.deleteAllByPostId(postId);
             return ResponseEntity.ok("Post deleted successfully");
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("You are not authorized to delete this post");

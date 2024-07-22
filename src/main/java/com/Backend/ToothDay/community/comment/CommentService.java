@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class CommentService {
 
-
     private final CommentRepository commentRepository;
 
     public void save(Comment comment) {
@@ -31,7 +30,7 @@ public class CommentService {
         return commentRepository.findByPostId(postId);
     }
 
-    public List<Comment> findByUserId(Long userId) { return commentRepository.findByUserId(userId); }
+    public List<Comment> findByUserIdPaging(Long userId, int limit, int offset) { return commentRepository.findByUserIdPaging(userId, limit, offset); }
 
     public int countByPostId(Long postId) {
         return commentRepository.countByPostId(postId);

@@ -2,6 +2,7 @@ package com.Backend.ToothDay.jwt.controller;
 
 
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
+import com.Backend.ToothDay.jwt.dto.UserDTO;
 import com.Backend.ToothDay.jwt.dto.UserProfileUpdateRequest;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
@@ -27,7 +28,7 @@ public class UserController {
 
     // 프로필 조회 API
     @GetMapping("/api/user/profile")
-    public User getProfile(HttpServletRequest httpServletRequest) {
+    public UserDTO getProfile(HttpServletRequest httpServletRequest) {
         // JWT 토큰에서 userId 추출
         String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -35,12 +36,12 @@ public class UserController {
         // userId를 이용하여 User 객체를 가져옵니다.
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("유저가 존재하지 않습니다."));
 
-        return user;
+        return UserDTO.from(user);
     }
 
 
     @PutMapping("/api/user/profile")
-    public User updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+    public UserDTO updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
                               @RequestPart(value ="request",  required = false) String requestJson,
                               HttpServletRequest httpServletRequest) throws IOException {
         // JWT 토큰에서 userId 추출
@@ -77,7 +78,7 @@ public class UserController {
         // 수정된 User 객체를 저장합니다.
         userRepository.save(user);
 
-        return user;
+        return UserDTO.from(user);
     }
 
     @Data

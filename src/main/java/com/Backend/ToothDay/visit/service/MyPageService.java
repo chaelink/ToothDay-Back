@@ -7,7 +7,9 @@ import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Page;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -21,9 +23,13 @@ public class MyPageService {
     @Autowired
     private VisitRepository visitRepository;
 
-    public List<VisitRecordDTO> getVisitRecordsForUser(String token) {
+    public List<VisitRecordDTO> getVisitRecordsForUser(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
-        List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
+        // Pageable 객체 생성
+        Pageable pageable = PageRequest.of(offset, limit);
+
+        // 페이지 처리: offset과 limit을 사용하여 데이터 조회
+        List<Visit> visits = visitRepository.findByUserId(userId, pageable);
 
         return visits.stream()
                 .map(visit -> convertToDto(visit, userId))
@@ -45,12 +51,13 @@ public class MyPageService {
         boolean isWrittenByCurrentUser = visit.getUser() != null && visit.getUser().getId() == userId;
 
         return VisitRecordDTO.builder()
+                .visitId(visit.getId()) // visitId 추가
                 .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
                 .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
                 .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
-                .treatmentlist(treatmentDTOs)
+                .treatmentList(treatmentDTOs)
                 .totalAmount(totalAmount)
                 .isWrittenByCurrentUser(isWrittenByCurrentUser) // 작성자 여부 추가
                 .build();
@@ -80,21 +87,22 @@ public class MyPageService {
 
         return visits.stream()
                 .flatMap(visit -> visit.getTreatmentlist().stream()
-                        .map(treatment -> new VisitRecordDTO(
-                                visit.getDentist() != null ? visit.getDentist().getDentistId() : null,
-                                visit.getDentist() != null ? visit.getDentist().getDentistName() : null,
-                                visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null,
-                                visit.getVisitDate(),
-                                visit.isShared(),
-                                List.of(new TreatmentDTO(
+                        .map(treatment -> VisitRecordDTO.builder()
+                                .visitId(visit.getId()) // visitId 추가
+                                .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
+                                .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
+                                .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
+                                .visitDate(visit.getVisitDate())
+                                .isShared(visit.isShared())
+                                .treatmentList(List.of(new TreatmentDTO(
                                         treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null,
                                         treatment.getCategory() != null ? treatment.getCategory().name() : null,
                                         treatment.getAmount() != null ? treatment.getAmount() : 0
-                                )),
-                                treatment.getAmount(), // totalAmount
-                                visit.getUser() != null && visit.getUser().getId() == userId // isWrittenByCurrentUser
-                        )))
-                .filter(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId() != null) // toothId가 null인 값을 제외함
-                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentlist().get(0).getToothId().intValue())); // 그룹화
+                                )))
+                                .totalAmount(treatment.getAmount())
+                                .isWrittenByCurrentUser(visit.getUser() != null && visit.getUser().getId() == (userId))
+                                .build()))
+                .filter(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId() != null) // toothId가 null인 값을 제외함
+                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId().intValue())); // 그룹화
     }
 }

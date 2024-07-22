@@ -1,5 +1,6 @@
 package com.Backend.ToothDay.visit.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,11 +17,12 @@ public class VisitListDTO {
     private String dentistName;
     private String dentistAddress;
     private String visitDate;
+    @JsonProperty("isShared")
     private boolean isShared;
     private List<TreatmentDTO> treatmentList;
     private Long totalAmount;
     private boolean writtenByCurrentUser;
-    private Long visitID;
-    private Long userID;
+    private Long visitId;
+    private Long userId;
     private String profileImageUrl;
 }

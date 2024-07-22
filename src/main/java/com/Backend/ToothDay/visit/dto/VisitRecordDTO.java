@@ -14,12 +14,13 @@ import java.util.List;
 @Builder
 public class VisitRecordDTO {
 //    private Long userId;
+    private Long visitId; //visitId필드 추가
     private Long dentistId;
     private String dentistName;  // 치과 이름 필드 추가
     private String dentistAddress;
-    private Date visitDate;
+    private String visitDate;
     private boolean isShared;
-    private List<TreatmentDTO> treatmentlist;
+    private List<TreatmentDTO> treatmentList;
     private Integer totalAmount;
     private boolean isWrittenByCurrentUser; // 유저가 작성한 진료기록인지 T/F로 받을 수 있는 변수 추가
 

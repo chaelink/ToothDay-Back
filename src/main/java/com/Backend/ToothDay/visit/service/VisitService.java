@@ -66,7 +66,7 @@ public class VisitService {
 
         Visit savedVisit = visitRepository.save(visit);
 
-        List<Treatment> treatments = visitRecordDTO.getTreatmentlist().stream().map(dto -> {
+        List<Treatment> treatments = visitRecordDTO.getTreatmentList().stream().map(dto -> {
             ToothNumber toothNumber = null;
             if (!requiresNoToothNumber(dto.getCategory())) {
                 toothNumber = toothNumberRepository.findById(dto.getToothId())
@@ -89,16 +89,18 @@ public class VisitService {
                 .mapToInt(Treatment::getAmount)
                 .sum();
 
-        // isWrittenByCurrentUser 값을 설정
-        boolean isWrittenByCurrentUser = savedVisit.getUser() != null && savedVisit.getUser().getId() == userId;
-        visitRecordDTO.setWrittenByCurrentUser(isWrittenByCurrentUser);
-
-        // Dentist 정보 설정
-        visitRecordDTO.setDentistName(dentist.getDentistName());
-        visitRecordDTO.setDentistAddress(dentist.getDentistAddress());
-        visitRecordDTO.setTotalAmount(totalAmount);
-
-        return visitRecordDTO;
+        // VisitRecordDTO 객체 업데이트
+        return VisitRecordDTO.builder()
+                .visitId(savedVisit.getId()) // visitId 설정
+                .dentistId(dentist.getDentistId())
+                .dentistName(dentist.getDentistName())
+                .dentistAddress(dentist.getDentistAddress())
+                .visitDate(savedVisit.getVisitDate())
+                .isShared(savedVisit.isShared())
+                .treatmentList(mapTreatmentListToTreatmentDTOList(treatments))
+                .totalAmount(totalAmount)
+                .isWrittenByCurrentUser(userId.equals(savedVisit.getUser().getId()))
+                .build();
     }
 
     private boolean requiresNoToothNumber(String category) {
@@ -154,7 +156,7 @@ public class VisitService {
         // Treatments 업데이트
         List<Treatment> updatedTreatments = new ArrayList<>();
 
-        for (TreatmentDTO dto : visitRecordDTO.getTreatmentlist()) {
+        for (TreatmentDTO dto : visitRecordDTO.getTreatmentList()) {
             Treatment treatment = new Treatment();
             treatment.setVisit(visit);
             treatment.setCategory(Category.valueOf(dto.getCategory()));
@@ -182,7 +184,12 @@ public class VisitService {
 
         // Visit를 저장하고 변환된 VisitRecordDTO를 반환
         visitRepository.save(visit);
-        return mapVisitToVisitRecordDTO(visit);
+        VisitRecordDTO updatedVisitRecordDTO = mapVisitToVisitRecordDTO(visit);
+
+        // visitId 설정
+        updatedVisitRecordDTO.setVisitId(visitId);
+
+        return updatedVisitRecordDTO;
 
     }
 
@@ -196,12 +203,13 @@ public class VisitService {
                 .sum();
 
         VisitRecordDTO visitRecordDTO = VisitRecordDTO.builder()
+                .visitId(visit.getId())  // visitId 설정
                 .dentistId(visit.getDentist().getDentistId())
                 .dentistName(visit.getDentist().getDentistName())
                 .dentistAddress(visit.getDentist().getDentistAddress())
                 .visitDate(visit.getVisitDate())
                 .isShared(visit.isShared())
-                .treatmentlist(mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist()))
+                .treatmentList(mapTreatmentListToTreatmentDTOList(visit.getTreatmentlist()))
                 .totalAmount(totalAmount)
                 .isWrittenByCurrentUser(false) // 기본값으로 false 설정
                 .build();
@@ -214,16 +222,15 @@ public class VisitService {
 
         return visitRecordDTO;
     }
-        private List<TreatmentDTO> mapTreatmentListToTreatmentDTOList(List<Treatment> treatments) {
-            return treatments.stream()
-                    .map(treatment -> TreatmentDTO.builder()
-                            .toothId(treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null)
-                            .category(treatment.getCategory().toString())
-                            .amount(treatment.getAmount())
-                            .build())
-                    .collect(Collectors.toList());
-        }
+    private List<TreatmentDTO> mapTreatmentListToTreatmentDTOList(List<Treatment> treatments) {
+        return treatments.stream()
+                .map(treatment -> TreatmentDTO.builder()
+                        .toothId(treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null)
+                        .category(treatment.getCategory().toString())
+                        .amount(treatment.getAmount())
+                        .build())
+                .collect(Collectors.toList());
     }
-
+}
 
 
