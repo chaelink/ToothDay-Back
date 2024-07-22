@@ -28,8 +28,8 @@ public class MyService {
     private final CommentService commentService;
     private final LikeService likeService;
 
-    public List<MyPostDTO> getMyPostDTOs(long userId) {
-        List<Post> postList = postRepository.findByUserId(userId);
+    public List<MyPostDTO> getMyPostDTOs(long userId, int limit, int offset) {
+        List<Post> postList = postRepository.findByUserIdPaging(userId, limit, offset);
         if (postList.isEmpty()) {
             throw new RuntimeException("작성한 글이 없습니다");
         }
@@ -57,8 +57,8 @@ public class MyService {
         return myPostDTOList;
     }
 
-    public List<MyLikePostDTO> getMyLikePostDTOs(long userId) {
-        List<PostLike> postLikeList = likeService.findByuserId(userId);
+    public List<MyLikePostDTO> getMyLikePostDTOs(long userId, int limit, int offset) {
+        List<PostLike> postLikeList = likeService.findByuserIdPaging(userId, limit, offset);
         if (postLikeList.isEmpty()) {
             throw new RuntimeException("좋아요한 글이 없습니다");
         }
@@ -90,8 +90,8 @@ public class MyService {
         return myLikePostDTOList;
     }
 
-    public List<MyCommentPostDTO> getMyCommentPostDTOs (long userId) {
-        List<Comment> commentList = commentService.findByUserId(userId);
+    public List<MyCommentPostDTO> getMyCommentPostDTOs (long userId, int limit, int offset) {
+        List<Comment> commentList = commentService.findByUserIdPaging(userId, limit, offset);
         if(commentList.isEmpty()) {
             throw new RuntimeException("작성한 댓글이 없습니다");
         }

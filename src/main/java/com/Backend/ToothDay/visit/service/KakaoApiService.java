@@ -44,7 +44,7 @@ public class KakaoApiService {
         String decodedUriString = UriUtils.decode(uriString, "UTF-8");
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization",  kakaoApiKey); // 인증을 위한 "KakaoAK " 접두사 추가
+        headers.set("Authorization",   kakaoApiKey); // 인증을 위한 "KakaoAK " 접두사 추가
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         // Kakao API에 HTTP GET 요청
@@ -58,8 +58,8 @@ public class KakaoApiService {
         // 응답 본문을 파싱하여 필요한 데이터 추출
         List<PlaceInfo> placeInfoList = parseResponse(response.getBody());
 
-        // PlaceInfo 데이터를 데이터베이스에 저장
-        savePlacesToDatabase(placeInfoList);
+        // PlaceInfo 데이터를 데이터베이스에 저장 또는 업데이트
+        saveOrUpdatePlacesInDatabase(placeInfoList);
 
         return placeInfoList;
     }
@@ -77,6 +77,10 @@ public class KakaoApiService {
                 String dentistName = node.path("place_name").asText();
                 String dentistId = node.path("id").asText();
                 dentistAddress = dentistAddress.replaceAll("(동)([^\\d]*)\\d.*", "$1$2");
+                dentistAddress = dentistAddress.replaceAll("(읍)([^\\d]*)\\d.*", "$1$2");
+                dentistAddress = dentistAddress.replaceAll("(면)([^\\d]*)\\d.*", "$1$2");
+                dentistAddress = dentistAddress.replaceAll("(리)([^\\d]*)\\d.*", "$1$2");
+                dentistAddress = dentistAddress.replaceAll("(가)([^\\d]*)\\d.*", "$1$2");
                 placeInfoList.add(new PlaceInfo(dentistAddress, dentistName, dentistId));
             }
         } catch (IOException e) {
@@ -86,15 +90,25 @@ public class KakaoApiService {
         return placeInfoList;
     }
 
-    private void savePlacesToDatabase(List<PlaceInfo> placeInfoList) {
+    private void saveOrUpdatePlacesInDatabase(List<PlaceInfo> placeInfoList) {
         for (PlaceInfo placeInfo : placeInfoList) {
-            Dentist dentist = Dentist.builder()
-                    .dentistId(Long.parseLong(placeInfo.getDentistId())) // id가 고유하고 올바르게 파싱되었는지 확인
-                    .dentistName(placeInfo.getDentistName())
-                    .dentistAddress(placeInfo.getDentistAddress())
-                    .build();
+            Long dentistId = Long.parseLong(placeInfo.getDentistId());
 
-            dentistRepository.save(dentist);
+            Dentist existingDentist = dentistRepository.findById(dentistId).orElse(null);
+            if (existingDentist != null) {
+                // 기존 정보가 존재하면 업데이트
+                existingDentist.setDentistName(placeInfo.getDentistName());
+                existingDentist.setDentistAddress(placeInfo.getDentistAddress());
+                dentistRepository.save(existingDentist);
+            } else {
+                // 기존 정보가 없으면 새로 저장
+                Dentist newDentist = Dentist.builder()
+                        .dentistId(dentistId)
+                        .dentistName(placeInfo.getDentistName())
+                        .dentistAddress(placeInfo.getDentistAddress())
+                        .build();
+                dentistRepository.save(newDentist);
+            }
         }
     }
 

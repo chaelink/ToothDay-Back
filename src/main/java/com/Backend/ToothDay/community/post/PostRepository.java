@@ -11,6 +11,8 @@ import org.springframework.util.CollectionUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.TypedQuery;
+import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -66,28 +68,37 @@ public class PostRepository {
         }
     }
 
-    public List<Post> findAll() {
-        return em.createQuery("from Post", Post.class).getResultList();
+    public List<Post> findAllPaging(int limit, int offset) {
+
+        return em.createQuery("from Post", Post.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
-    public List<Post> findByKeywordId(int keywordId) {
-         List<PostKeyword> postKeywordList = em.createQuery("select e from PostKeyword e where e.keyword.id = :keywordId", PostKeyword.class)
-                 .setParameter("keywordId", keywordId)
-                 .getResultList();
-         List<Post> postList = new ArrayList<>();
-         for (PostKeyword postKeyword : postKeywordList) {
-             postList.add(em.find(Post.class, postKeyword.getPost().getId()));
-         }
-         return postList;
+
+    public List<Post> findByKeywordIdPaging(int keywordId, int limit, int offset) {
+        //PostKeyword에서 keywordId로 Post 조회
+        String queryStr = "SELECT pk.post FROM PostKeyword pk WHERE pk.keyword.id = :keywordId";
+        TypedQuery<Post> query = em.createQuery(queryStr, Post.class)
+                .setParameter("keywordId", keywordId)
+                .setFirstResult(offset)
+                .setMaxResults(limit);
+
+        return query.getResultList();
     }
+
+
 
     public Post findById(long postId) {
         return em.find(Post.class, postId);
     }
 
-    public List<Post> findByUserId(long userId) {
+    public List<Post> findByUserIdPaging(long userId, int limit, int offset) {
         return em.createQuery("select p from Post p where p.user.id = :userId",Post.class)
                 .setParameter("userId",userId)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
                 .getResultList();
     }
 
