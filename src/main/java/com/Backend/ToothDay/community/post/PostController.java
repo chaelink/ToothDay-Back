@@ -1,4 +1,5 @@
 package com.Backend.ToothDay.community.post;
+import com.Backend.ToothDay.community.comment.CommentDTO;
 import com.Backend.ToothDay.community.image.ImageService;
 import com.Backend.ToothDay.community.like.LikeService;
 import com.Backend.ToothDay.community.post.model.Post;
@@ -51,7 +52,15 @@ public class PostController {
             } else {
                 postDTO.setWrittenByCurrentUser(false);
             }
+            for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+                if(commentDTO.getUserId()==userId) {
+                    commentDTO.setWrittenByCurrentUser(true);
+                } else {
+                    commentDTO.setWrittenByCurrentUser(false);
+                }
+            }
         }
+
         return postDTOList;
     }
 
@@ -80,6 +89,13 @@ public class PostController {
                 postDTO.setWrittenByCurrentUser(true);
             } else {
                 postDTO.setWrittenByCurrentUser(false);
+            }
+            for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+                if(commentDTO.getUserId()==userId) {
+                    commentDTO.setWrittenByCurrentUser(true);
+                } else {
+                    commentDTO.setWrittenByCurrentUser(false);
+                }
             }
         }
         return postDTOList;
@@ -138,6 +154,13 @@ public class PostController {
         } else {
             postDTO.setWrittenByCurrentUser(false);
         }
+        for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+            if(commentDTO.getUserId()==userId) {
+                commentDTO.setWrittenByCurrentUser(true);
+            } else {
+                commentDTO.setWrittenByCurrentUser(false);
+            }
+        }
         return postDTO;
     }
 
@@ -166,6 +189,13 @@ public class PostController {
                 postDTO.setLikedByCurrentUser(true);
             } else {
                 postDTO.setLikedByCurrentUser(false);
+            }
+            for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+                if(commentDTO.getUserId()==userId) {
+                    commentDTO.setWrittenByCurrentUser(true);
+                } else {
+                    commentDTO.setWrittenByCurrentUser(false);
+                }
             }
             return postDTO;
         }

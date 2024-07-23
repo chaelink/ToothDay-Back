@@ -11,5 +11,7 @@ public class CommentDTO {
     private String content;
     private LocalDateTime createDate;
     private String username;
+    private Long userId;
     private String profileImageUrl;
+    private boolean isWrittenByCurrentUser;
 }

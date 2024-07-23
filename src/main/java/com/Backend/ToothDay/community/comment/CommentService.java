@@ -42,6 +42,7 @@ public class CommentService {
         commentDTO.setContent(comment.getContent());
         commentDTO.setCreateDate(comment.getCreateDate());
         commentDTO.setUsername(comment.getUser().getUsername());
+        commentDTO.setUserId(comment.getUser().getId());
         commentDTO.setProfileImageUrl(comment.getUser().getProfileImageUrl());
         return commentDTO;
     }
