@@ -29,8 +29,7 @@ public class MyPageService {
         Pageable pageable = PageRequest.of(offset, limit);
 
         // 페이지 처리: offset과 limit을 사용하여 데이터 조회
-        List<Visit> visits = visitRepository.findByUserId(userId, pageable);
-
+        List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateAsc(userId, pageable);
         return visits.stream()
                 .map(visit -> convertToDto(visit, userId))
                 .collect(Collectors.toList());
@@ -63,13 +62,11 @@ public class MyPageService {
                 .build();
     }
 
-
     public VisitRecordDTO getVisitRecordById(Long visitId, String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
 
         Visit visit = visitRepository.findById(visitId)
                 .orElseThrow(() -> new RuntimeException("진료기록을 찾을 수 없습니다."));
-
 
         Long visitUserId = visit.getUser().getId();
         // 사용자가 자신의 기록만 조회할 수 있도록 검증
@@ -80,10 +77,10 @@ public class MyPageService {
         return convertToDto(visit, userId);
     }
 
-    // 새로운 서비스 로직 추가
+    // 새로운 서비스 로직 수정
     public Map<Integer, List<VisitRecordDTO>> getVisitRecordsGroupedByToothId(String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
-        List<Visit> visits = visitRepository.findByUserId(userId);  // 사용자 ID로 방문 기록을 가져옴
+        List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateAsc(userId); // 방문 기록을 visitDate 기준으로 정렬
 
         return visits.stream()
                 .flatMap(visit -> visit.getTreatmentlist().stream()
