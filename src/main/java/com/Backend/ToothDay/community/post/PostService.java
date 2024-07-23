@@ -5,9 +5,11 @@ import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.community.post.model.PostDTO;
 import com.Backend.ToothDay.jwt.dto.UserDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
+import java.awt.print.Pageable;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.Backend.ToothDay.jwt.model.User;
@@ -60,13 +62,13 @@ public class PostService {
         return postDTO;
     }
 
-    public List<PostDTO> getAllPostDTO() {
-        List<Post> posts = postRepository.findAll();
+    public List<PostDTO> getAllPostDTOPaging(int limit, int offset) {
+        List<Post> posts = postRepository.findAllPaging(limit,offset);
         return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
     }
 
-    public List<PostDTO> getPostDTOByKeywordId(int keywordId) {
-        List<Post> posts = postRepository.findByKeywordId(keywordId);
+    public List<PostDTO> getPostDTOByKeywordIdPaging(int keywordId, int limit, int offset) {
+        List<Post> posts = postRepository.findByKeywordIdPaging(keywordId, limit, offset);
         return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
     }
 

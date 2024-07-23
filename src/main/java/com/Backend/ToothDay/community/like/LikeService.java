@@ -50,8 +50,8 @@ public class LikeService {
         return likeRepository.findByPostIdAndUserId(postId, userId);
     }
 
-    public List<PostLike> findByuserId(long userId) {
-        return likeRepository.findByUserId(userId);
+    public List<PostLike> findByuserIdPaging(long userId, int limit, int offset) {
+        return likeRepository.findByUserIdPaging(userId,limit,offset);
     }
 
 
