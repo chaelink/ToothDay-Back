@@ -1,6 +1,7 @@
 package com.Backend.ToothDay.jwt.config.jwt;
 
 import java.io.IOException;
+import java.util.Enumeration;
 import java.util.Optional;
 
 import javax.servlet.FilterChain;
@@ -11,6 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 import com.Backend.ToothDay.jwt.config.auth.PrincipalDetails;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -22,8 +25,8 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 // 인가
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
-
     private UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(JwtAuthorizationFilter.class);
 
     public JwtAuthorizationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
         super(authenticationManager);
@@ -33,43 +36,49 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws IOException, ServletException {
+        try {
+            // 모든 요청의 헤더를 로그로 기록
+            Enumeration<String> headerNames = request.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String headerName = headerNames.nextElement();
+                logger.info("Header Name: " + headerName + ", Value: " + request.getHeader(headerName));
+            }
+            String header = request.getHeader(JwtProperties.HEADER_STRING);
+            logger.info("Request URL: " + request.getRequestURL());
+            logger.info("Request Method: " + request.getMethod());
+            logger.info("Request Header Authorization: " + header);
 
-        String header = request.getHeader(JwtProperties.HEADER_STRING);
-        System.out.println("header Authorization : " + header);
-
-        if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
-            chain.doFilter(request, response);
-            return;
-        }
-
-        String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
-
-        // JwtUtil을 사용하여 Token에서 Username을 추출
-        Long userId = JwtUtil.getUserIdFromToken(token);
-
-
-        // User ID가 null이 아닌 경우에만 처리
-        if (userId != null) {
-            Optional<User> optionalUser = userRepository.findById(userId);
-
-            // User가 존재할 경우, 인증 처리
-            if (optionalUser.isPresent()) {
-                User user = optionalUser.get();
-                PrincipalDetails principalDetails = new PrincipalDetails(user);
-                Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
-                        null,
-                        principalDetails.getAuthorities());
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-            } else {
-                // User가 존재하지 않을 경우, 적절한 로그 처리 또는 예외 처리
-                System.out.println("User not found with ID: " + userId);
-                // 예를 들어, 인증 실패 응답을 반환할 수 있음
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            if (header == null || !header.startsWith(JwtProperties.TOKEN_PREFIX)) {
+                chain.doFilter(request, response);
                 return;
             }
-        }
 
-        // 다음 필터로 이동
-        chain.doFilter(request, response);
+            String token = header.replace(JwtProperties.TOKEN_PREFIX, "");
+
+            // JwtUtil을 사용하여 Token에서 Username을 추출
+            Long userId = JwtUtil.getUserIdFromToken(token);
+
+            if (userId != null) {
+                Optional<User> optionalUser = userRepository.findById(userId);
+
+                if (optionalUser.isPresent()) {
+                    User user = optionalUser.get();
+                    PrincipalDetails principalDetails = new PrincipalDetails(user);
+                    Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails,
+                            null,
+                            principalDetails.getAuthorities());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                } else {
+                    logger.warn("User not found with ID: " + userId);
+                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    return;
+                }
+            }
+
+            chain.doFilter(request, response);
+        } catch (Exception e) {
+            logger.error("Exception in JwtAuthorizationFilter", e);
+            response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
+        }
     }
 }
