@@ -50,6 +50,13 @@ public class CommentController {
         } else {
             postDTO.setLikedByCurrentUser(false);
         }
+        for (CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+            if(commentDTO.getUserId()==userId) {
+                commentDTO.setWrittenByCurrentUser(true);
+            } else {
+                commentDTO.setWrittenByCurrentUser(false);
+            }
+        }
         return postDTO;
     }
 
