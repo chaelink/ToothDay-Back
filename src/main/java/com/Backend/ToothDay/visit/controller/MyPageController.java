@@ -17,12 +17,13 @@ public class MyPageController {
 
     @GetMapping("/visit")
     public List<VisitRecordDTO> getVisitRecords(
-            @RequestParam(value = "offset", defaultValue = "0")int offset,
-            @RequestParam(value = "limit", defaultValue = "10")int limit,
-            HttpServletRequest request){
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
+            HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return myPageService.getVisitRecordsForUser(token, offset, limit);
     }
+
     @GetMapping("/visit/{visitId}")
     public VisitRecordDTO getVisitRecordDetails(@PathVariable Long visitId, HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
@@ -30,7 +31,7 @@ public class MyPageController {
     }
 
     @GetMapping("/treatment")
-    public Map<Integer, List<VisitRecordDTO>> getVisitRecordsGroupedByToothId(HttpServletRequest request){
+    public Map<Integer, List<VisitRecordDTO>> getVisitRecordsGroupedByToothId(HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         return myPageService.getVisitRecordsGroupedByToothId(token);
     }
