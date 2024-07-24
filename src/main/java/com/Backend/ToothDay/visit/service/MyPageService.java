@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -82,24 +85,56 @@ public class MyPageService {
         Long userId = jwtUtil.getUserIdFromToken(token);
         List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateAsc(userId); // 방문 기록을 visitDate 기준으로 정렬
 
-        return visits.stream()
-                .flatMap(visit -> visit.getTreatmentlist().stream()
-                        .map(treatment -> VisitRecordDTO.builder()
-                                .visitId(visit.getId()) // visitId 추가
-                                .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
-                                .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
-                                .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
-                                .visitDate(visit.getVisitDate())
-                                .isShared(visit.isShared())
-                                .treatmentList(List.of(new TreatmentDTO(
-                                        treatment.getToothNumber() != null ? treatment.getToothNumber().getToothid() : null,
-                                        treatment.getCategory() != null ? treatment.getCategory().name() : null,
-                                        treatment.getAmount() != null ? treatment.getAmount() : 0
-                                )))
-                                .totalAmount(treatment.getAmount())
-                                .isWrittenByCurrentUser(visit.getUser() != null && visit.getUser().getId() == (userId))
-                                .build()))
-                .filter(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId() != null) // toothId가 null인 값을 제외함
-                .collect(Collectors.groupingBy(treatmentDTO -> treatmentDTO.getTreatmentList().get(0).getToothId().intValue())); // 그룹화
+        // 데이터를 toothId별로 그룹핑
+        Map<Integer, Map<Long, VisitRecordDTO>> groupedByToothId = new HashMap<>();
+
+        for (Visit visit : visits) {
+            visit.getTreatmentlist().forEach(treatment -> {
+                // toothId가 null이거나 0인 경우 처리하지 않음
+                if (treatment.getToothNumber() == null || treatment.getToothNumber().getToothid() == 0) {
+                    return;
+                }
+                int toothId = Math.toIntExact(treatment.getToothNumber().getToothid());
+                long visitId = visit.getId();
+
+                // toothId 그룹을 얻거나 생성
+                Map<Long, VisitRecordDTO> visitMap = groupedByToothId.computeIfAbsent(toothId, k -> new HashMap<>());
+
+                // visitId 그룹을 얻거나 생성
+                VisitRecordDTO visitRecordDTO = visitMap.get(visitId);
+                if (visitRecordDTO == null) {
+                    visitRecordDTO = VisitRecordDTO.builder()
+                            .visitId(visit.getId())
+                            .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
+                            .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
+                            .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
+                            .visitDate(visit.getVisitDate())
+                            .isShared(visit.isShared())
+                            .treatmentList(new ArrayList<>())
+                            .totalAmount(0)
+                            .isWrittenByCurrentUser(visit.getUser() != null && userId != null && visit.getUser().getId() == userId)
+                            .build();
+
+                    visitMap.put(visitId, visitRecordDTO);
+                }
+
+                // 치료 내역 추가
+                visitRecordDTO.getTreatmentList().add(new TreatmentDTO(
+                        (long) toothId,
+                        treatment.getCategory() != null ? treatment.getCategory().name() : null,
+                        treatment.getAmount() != null ? treatment.getAmount() : 0
+                ));
+
+                // 총 금액 업데이트
+                visitRecordDTO.setTotalAmount(visitRecordDTO.getTotalAmount() + (treatment.getAmount() != null ? treatment.getAmount() : 0));
+            });
+        }
+
+        // 데이터를 반환 형식에 맞게 변환
+        return groupedByToothId.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> new ArrayList<>(entry.getValue().values())
+                ));
     }
 }
