@@ -15,9 +15,7 @@ public interface VisitRepository extends JpaRepository<Visit, Long> {
 
     // 페이징 처리와 내림차순 정렬
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId ORDER BY v.visitDate DESC")
-    Page<Visit> findByUserIdOrderByVisitDateDesc(@Param("userId") Long userId, Pageable pageable);
-
-    // 페이징 처리와 오름차순 정렬
+    Page<Visit> findByUserIdOrderByVisitDateDesc(@Param("userId") Long userId, Pageable pageable);    // 페이징 처리와 오름차순 정렬
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId ORDER BY v.visitDate ASC")
     Page<Visit> findByUserIdOrderByVisitDateAsc(@Param("userId") Long userId, Pageable pageable);
 
