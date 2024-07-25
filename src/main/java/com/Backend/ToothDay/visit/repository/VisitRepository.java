@@ -13,6 +13,9 @@ import java.util.List;
 
 @Repository
 public interface VisitRepository extends JpaRepository<Visit, Long> {
+    @Query("SELECT v FROM Visit v WHERE v.user.id = :userId ORDER BY v.visitDate DESC")
+    List<Visit> findByUserIdOrderByVisitDateDesc(@Param("userId") Long userId, Pageable pageable);
+
     @Query("SELECT v FROM Visit v WHERE v.user.id = :userId ORDER BY v.visitDate ASC")
     List<Visit> findByUserIdOrderByVisitDateAsc(@Param("userId") Long userId, Pageable pageable);    List<Visit> findByUserId(Long userId);
     List<Visit> findByIsShared(Boolean isShared);
