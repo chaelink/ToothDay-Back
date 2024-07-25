@@ -28,11 +28,9 @@ public class MyPageService {
 
     public List<VisitRecordDTO> getVisitRecordsForUser(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
-        // Pageable 객체 생성
         Pageable pageable = PageRequest.of(offset, limit);
 
-        // 페이지 처리: offset과 limit을 사용하여 데이터 조회
-        List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateAsc(userId, pageable);
+        List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateDesc(userId, pageable);
         return visits.stream()
                 .map(visit -> convertToDto(visit, userId))
                 .collect(Collectors.toList());
