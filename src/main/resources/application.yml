@@ -42,3 +42,4 @@ kakao:
   api:
     url: https://dapi.kakao.com/v2/local/search/keyword.json
     key: KakaoAK 291b8a8c9b5fa182c9f2d9fcedf51c9d
+
