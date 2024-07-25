@@ -8,6 +8,8 @@ import com.Backend.ToothDay.community.post.model.PostForm;
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +22,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Api(description = "커뮤니티 게시글 API") //컨트롤러 설명 작성
 public class PostController {
 
     private final UserRepository userRepository;
@@ -28,12 +31,14 @@ public class PostController {
     private final ImageService imageService;
     private final LikeService likeService;
 
+    @ApiOperation(value = "비유저 커뮤니티 첫화면(무한스크롤)")
     @GetMapping("/community") //비유저 커뮤니티 첫화면 페이징
     public List<PostDTO> NonLoginCommunityMain(@RequestParam(value = "offset", defaultValue = "0") int offset,
                                                @RequestParam(value = "limit", defaultValue = "10") int limit) {
         return postService.getAllPostDTOPaging(limit, offset);
     }
 
+    @ApiOperation(value = "유저 커뮤니티 첫화면(무한스크롤)")
     @GetMapping("/api/community") //유저 커뮤니티 첫화면 페이징
     public List<PostDTO> communityMain(HttpServletRequest request,
                                        @RequestParam(value = "offset", defaultValue = "0") int offset,

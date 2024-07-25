@@ -12,7 +12,9 @@ spring:
     serialization:
       fail-on-empty-beans: false
 
+
 ---
 spring:
   config:
     import: "optional:classpath:/application.yml"
+    
