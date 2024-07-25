@@ -4,6 +4,7 @@ import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.visit.dto.TreatmentDTO;
 import com.Backend.ToothDay.visit.dto.VisitRecordDTO;
 import com.Backend.ToothDay.visit.model.Visit;
+import com.Backend.ToothDay.visit.repository.ReVisitRepository;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -23,7 +24,8 @@ public class MyPageService {
 
     @Autowired
     private VisitRepository visitRepository;
-
+    @Autowired
+    private ReVisitRepository reVisitRepository;
 
     public List<VisitRecordDTO> getVisitRecordsForUser(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -31,12 +33,9 @@ public class MyPageService {
             throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
         }
 
-        // 페이지 인덱스는 0부터 시작하므로 offset이 0이면 첫 페이지를 요청합니다.
-        Pageable pageable = PageRequest.of(offset, limit, Sort.by("visitDate").descending());
-        Page<Visit> userVisitsPage = visitRepository.findByUserIdOrderByVisitDateDesc(userId, pageable);
+        List<Visit> userVisits = reVisitRepository.findByUserIdOrderByVisitDateDesc(userId, offset, limit);
 
-        // DTO로 변환하여 반환합니다.
-        return userVisitsPage.getContent().stream()
+        return userVisits.stream()
                 .map(visit -> convertToDto(visit, userId))
                 .collect(Collectors.toList());
     }
