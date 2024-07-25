@@ -6,15 +6,13 @@ import com.Backend.ToothDay.visit.dto.VisitRecordDTO;
 import com.Backend.ToothDay.visit.model.Visit;
 import com.Backend.ToothDay.visit.repository.VisitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,16 +24,22 @@ public class MyPageService {
     @Autowired
     private VisitRepository visitRepository;
 
+
     public List<VisitRecordDTO> getVisitRecordsForUser(String token, int offset, int limit) {
         Long userId = jwtUtil.getUserIdFromToken(token);
-        Pageable pageable = PageRequest.of(offset, limit);
+        if (userId == null) {
+            throw new RuntimeException("토큰에서 유저 아이디를 가져올 수 없습니다.");
+        }
 
-        List<Visit> visits = visitRepository.findByUserIdOrderByVisitDateDesc(userId, pageable);
-        return visits.stream()
+        // 페이지 인덱스는 0부터 시작하므로 offset이 0이면 첫 페이지를 요청합니다.
+        Pageable pageable = PageRequest.of(offset, limit, Sort.by("visitDate").descending());
+        Page<Visit> userVisitsPage = visitRepository.findByUserIdOrderByVisitDateDesc(userId, pageable);
+
+        // DTO로 변환하여 반환합니다.
+        return userVisitsPage.getContent().stream()
                 .map(visit -> convertToDto(visit, userId))
                 .collect(Collectors.toList());
     }
-
     private VisitRecordDTO convertToDto(Visit visit, Long userId) {
         List<TreatmentDTO> treatmentDTOs = visit.getTreatmentlist().stream()
                 .map(treatment -> new TreatmentDTO(
@@ -47,11 +51,11 @@ public class MyPageService {
         int totalAmount = treatmentDTOs.stream()
                 .mapToInt(TreatmentDTO::getAmount)
                 .sum();
-        // 작성자 여부 설정
-        boolean isWrittenByCurrentUser = visit.getUser() != null && visit.getUser().getId() == userId;
+
+        boolean isWrittenByCurrentUser = visit.getUser() != null && visit.getUser().getId()==(userId);
 
         return VisitRecordDTO.builder()
-                .visitId(visit.getId()) // visitId 추가
+                .visitId(visit.getId())
                 .dentistId(visit.getDentist() != null ? visit.getDentist().getDentistId() : null)
                 .dentistName(visit.getDentist() != null ? visit.getDentist().getDentistName() : null)
                 .dentistAddress(visit.getDentist() != null ? visit.getDentist().getDentistAddress() : null)
@@ -59,10 +63,9 @@ public class MyPageService {
                 .isShared(visit.isShared())
                 .treatmentList(treatmentDTOs)
                 .totalAmount(totalAmount)
-                .isWrittenByCurrentUser(isWrittenByCurrentUser) // 작성자 여부 추가
+                .isWrittenByCurrentUser(isWrittenByCurrentUser)
                 .build();
     }
-
     public VisitRecordDTO getVisitRecordById(Long visitId, String token) {
         Long userId = jwtUtil.getUserIdFromToken(token);
 
