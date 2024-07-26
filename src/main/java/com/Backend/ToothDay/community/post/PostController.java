@@ -8,7 +8,8 @@ import com.Backend.ToothDay.community.post.model.PostForm;
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -110,12 +111,7 @@ public class PostController {
         return new PostForm();
     }
 
-
     @PostMapping("/community/upload") //게시글 작성
-//    @ApiImplicitParams({
-//            @ApiImplicitParam(name = "postForm", value = "게시글 데이터", required = true, dataType = "Text", defaultValue = "multipart/form-data" ),
-//            @ApiImplicitParam(name = "files", value = "게시글 이미지", required = false, dataType = "File", defaultValue = "multipart/form-data")
-//    })
     public PostDTO communityUpload(@RequestPart(value = "postForm") PostForm postForm,
                                    @RequestPart(value = "files",required = false) List<MultipartFile> files,
                                    HttpServletRequest request) {
