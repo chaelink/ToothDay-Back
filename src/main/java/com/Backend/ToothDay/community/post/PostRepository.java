@@ -67,6 +67,50 @@ public class PostRepository {
         }
     }
 
+    public void resave(Post post, List<Integer> keywordIds) {
+        if(CollectionUtils.isEmpty(keywordIds)) {
+            Keyword keyword = em.find(Keyword.class,1);
+            if (keyword == null) {
+                throw new NullPointerException("Keyword with ID 1 is null");
+            }
+            PostKeyword postKeyword = new PostKeyword();
+            PostKeywordId postKeywordId = new PostKeywordId(post.getId(), keyword.getId());
+            postKeyword.setPostKeywordId(postKeywordId);
+            postKeyword.setPost(post);
+            postKeyword.setKeyword(keyword);
+            em.persist(postKeyword);
+            post.getPostKeywords().add(postKeyword);
+        }
+        else {
+            Keyword keyword1 = em.find(Keyword.class,1);
+            if (keyword1 == null) {
+                throw new NullPointerException("Keyword with ID 1 is null");
+            }
+            PostKeyword postKeyword1 = new PostKeyword();
+            PostKeywordId postKeywordId1 = new PostKeywordId(post.getId(), keyword1.getId());
+            postKeyword1.setPostKeywordId(postKeywordId1);
+            postKeyword1.setPost(post);
+            postKeyword1.setKeyword(keyword1);
+            em.persist(postKeyword1);
+            post.getPostKeywords().add(postKeyword1);
+            for (Integer keywordId : keywordIds) {
+                Keyword keyword = em.find(Keyword.class, keywordId);
+                if(keyword != null) {
+                    PostKeyword postKeyword = new PostKeyword();
+                    PostKeywordId postKeywordId = new PostKeywordId(post.getId(), keywordId);
+                    postKeyword.setPostKeywordId(postKeywordId);
+                    postKeyword.setPost(post);
+                    postKeyword.setKeyword(keyword);
+                    em.persist(postKeyword);
+                    post.getPostKeywords().add(postKeyword);
+                }
+                else {
+                    throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
+                }
+            }
+        }
+    }
+
     public List<Post> findAllPaging(int limit, int offset) {
 
         return em.createQuery("from Post", Post.class)

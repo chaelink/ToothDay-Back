@@ -224,7 +224,7 @@ public class PostController {
             post.setContent(postForm.getContent());
             postKeywordRepository.deleteAllByPostId(postId);  //기존의 postkeyword삭제
             post.getPostKeywords().clear();  //403에러수정
-            postService.save(post,postForm.getKeywords());
+            postService.resave(post,postForm.getKeywords());  //수정 위한 저장 메서드 생성
             if(post.getImageList()!=null) {
                 imageService.deleteAllByPostId(postId);
             }

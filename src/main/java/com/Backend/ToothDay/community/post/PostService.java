@@ -29,6 +29,8 @@ public class PostService {
 
     public void save(Post post, List<Integer> keywordIds) { postRepository.save(post, keywordIds); }
 
+    public void resave(Post post, List<Integer> keywordIds) { postRepository.resave(post, keywordIds); }
+
     public void delete(Post post) {
         postRepository.delete(post);
     }
