@@ -5,10 +5,11 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Getter @Setter
 @Entity
-public class PostKeyword {
+public class PostKeyword implements Serializable {
 
     @EmbeddedId //복합키를 사용하기 위해 PostKeywordId 선언
     private PostKeywordId postKeywordId;
