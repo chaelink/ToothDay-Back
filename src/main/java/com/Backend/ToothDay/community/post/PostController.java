@@ -77,9 +77,9 @@ public class PostController {
 
     @GetMapping("/api/community/search/{keywordId}") //유저 게시글목록 조회 페이징
     public List<PostDTO> communityFindByKeywordIdPaging(@PathVariable int keywordId,
-                                                  HttpServletRequest request,
-                                                  @RequestParam(value = "offset", defaultValue = "0") int offset,
-                                                   @RequestParam(value = "limit", defaultValue = "10") int limit) {
+                                                        HttpServletRequest request,
+                                                        @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                                        @RequestParam(value = "limit", defaultValue = "10") int limit) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
         List<PostDTO> postDTOList = postService.getPostDTOByKeywordIdPaging(keywordId, limit, offset);
@@ -104,6 +104,44 @@ public class PostController {
         }
         return postDTOList;
     }
+
+    @GetMapping("/community/search")
+    public List<PostDTO> communitySearch(@RequestParam(value = "search") String search,
+                                         @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                         @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return postService.getPostDTOByQueryPaging(search, offset, limit);
+    }
+
+    @GetMapping("/api/community/search")
+    public List<PostDTO> communitySearch(HttpServletRequest request,
+                                         @RequestBody String search,
+                                         @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                         @RequestParam(value = "limit", defaultValue = "10") int limit ) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        Long userId = JwtUtil.getUserIdFromToken(token);
+        List<PostDTO> postDTOList = postService.getPostDTOByQueryPaging(search, offset, limit);
+        for (PostDTO postDTO : postDTOList) {
+            if(likeService.findByPostIdAndUserId(postDTO.getPostId(), userId) != null) {
+                postDTO.setLikedByCurrentUser(true);
+            } else {
+                postDTO.setLikedByCurrentUser(false);
+            }
+            if(postDTO.getUser().getId()==userId) {
+                postDTO.setWrittenByCurrentUser(true);
+            } else {
+                postDTO.setWrittenByCurrentUser(false);
+            }
+            for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+                if(commentDTO.getUserId()==userId) {
+                    commentDTO.setWrittenByCurrentUser(true);
+                } else {
+                    commentDTO.setWrittenByCurrentUser(false);
+                }
+            }
+        }
+        return postDTOList;
+    }
+
 
     @GetMapping("/community/upload") //커뮤니티 작성 화면
     public PostForm communityUploadForm() {
