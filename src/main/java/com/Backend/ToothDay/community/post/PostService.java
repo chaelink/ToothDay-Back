@@ -72,4 +72,10 @@ public class PostService {
         return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
     }
 
+    public List<PostDTO> getPostDTOByQueryPaging(String query, int limit, int offset) {
+        List<Post> posts = postRepository.search(query, limit, offset);
+        System.out.println(posts);
+        return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
+    }
+
 }

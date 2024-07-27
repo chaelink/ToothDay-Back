@@ -12,7 +12,6 @@ import org.springframework.util.CollectionUtils;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.TypedQuery;
-import java.awt.print.Pageable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -97,6 +96,35 @@ public class PostRepository {
     public List<Post> findByUserIdPaging(long userId, int limit, int offset) {
         return em.createQuery("select p from Post p where p.user.id = :userId",Post.class)
                 .setParameter("userId",userId)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+    }
+
+//    public List<Post> searchPosts(String query, int limit, int offset) {
+//        String formattedQuery = "%" + query + "%";
+//        return em.createQuery("select p from Post p where p.title like :query", Post.class)
+//                .setParameter("query", formattedQuery)
+//                .setFirstResult(offset)
+//                .setMaxResults(limit)
+//                .getResultList();
+//    }
+
+    public List<Post> searchPosts(String query, int limit, int offset) {
+        String formattedQuery = "%" + query + "%";
+        log.debug("Executing search with query: {}", formattedQuery);
+        List<Post> results = em.createQuery("select p from Post p where p.title like :query", Post.class)
+                .setParameter("query", formattedQuery)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
+        log.debug("Search results: {}", results);
+        return results;
+    }
+
+    public List<Post> search(String search, int limit, int offset) {
+        return em.createQuery("select p from Post p where p.title=: search ",Post.class)
+                .setParameter("search",search)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
