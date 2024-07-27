@@ -223,6 +223,7 @@ public class PostController {
             post.setTitle(postForm.getTitle());  //새로운 post 정보 설정
             post.setContent(postForm.getContent());
             postKeywordRepository.deleteAllByPostId(postId);  //기존의 postkeyword삭제
+            post.getPostKeywords().clear();  //403에러수정
             postService.save(post,postForm.getKeywords());
             if(post.getImageList()!=null) {
                 imageService.deleteAllByPostId(postId);
