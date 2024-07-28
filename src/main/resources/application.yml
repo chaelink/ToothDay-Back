@@ -8,13 +8,37 @@ server:
       force: true
 
 spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://toothday.c34guoc6ir55.ap-northeast-2.rds.amazonaws.com:3306/toothday
+    username: toothuser
+    password: 5ToothDay!
+
+  jpa:
+    database: mysql
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 1054743034506-atjsapju5vt05ugd9oesgdi2mqqq5cir.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
+
   jackson:
     serialization:
       fail-on-empty-beans: false
 
-
----
-spring:
-  config:
-    import: "optional:classpath:/application.yml"
-    
+kakao:
+  api:
+    url: https://dapi.kakao.com/v2/local/search/keyword.json
+    key: KakaoAK 291b8a8c9b5fa182c9f2d9fcedf51c9d
