@@ -6,11 +6,6 @@ server:
       charset: UTF-8
       enabled: true
       force: true
-  ssl:
-    key-store: "swyp53.store.p12"
-    key-store-type: PKCS12
-    key-store-password: 1234
-    port: 8443
 
 spring:
   datasource:
