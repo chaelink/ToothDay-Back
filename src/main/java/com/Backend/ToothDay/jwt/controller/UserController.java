@@ -1,6 +1,7 @@
 package com.Backend.ToothDay.jwt.controller;
 
 
+import com.Backend.ToothDay.jwt.config.jwt.JwtProperties;
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.dto.UserDTO;
 import com.Backend.ToothDay.jwt.dto.UserProfileUpdateRequest;
@@ -41,9 +42,9 @@ public class UserController {
 
 
     @PutMapping("/api/user/profile")
-    public UserDTO updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-                              @RequestPart(value ="request",  required = false) String requestJson,
-                              HttpServletRequest httpServletRequest) throws IOException {
+    public ResponseEntity<UserDTO> updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
+                                                 @RequestPart(value = "request", required = false) String requestJson,
+                                                 HttpServletRequest httpServletRequest) throws IOException {
         // JWT 토큰에서 userId 추출
         String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -66,9 +67,7 @@ public class UserController {
             user.setProfileImageUrl("/profileImage/" + fileName);
         }
 
-        // 사용자 이름 수정
         if (requestJson != null) {
-            // JSON 파싱 (Jackson 라이브러리를 사용합니다)
             ObjectMapper objectMapper = new ObjectMapper();
             UserProfileUpdateRequest request = objectMapper.readValue(requestJson, UserProfileUpdateRequest.class);
             if (request.getUsername() != null) {
@@ -78,10 +77,16 @@ public class UserController {
                 user.setProfileImageUrl(null);
             }
         }
-        // 수정된 User 객체를 저장합니다.
+
         userRepository.save(user);
 
-        return UserDTO.from(user);
+        // 프로필이 업데이트된 사용자를 기반으로 새로운 JWT 토큰 생성
+        String newJwtToken = JwtUtil.generateToken(user.getUsername(), user.getId());
+
+        // 새로운 JWT 토큰을 응답 헤더에 추가
+        return ResponseEntity.ok()
+                .header(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + newJwtToken)
+                .body(UserDTO.from(user));
     }
 
     @Data
