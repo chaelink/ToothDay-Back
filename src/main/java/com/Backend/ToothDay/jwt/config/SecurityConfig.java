@@ -39,10 +39,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .formLogin().disable()
                 .httpBasic().disable()
                 // JWT 필터 추가
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager(), userRepository))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
                 .authorizeRequests()
                 .anyRequest().permitAll();
-                //.requiresChannel().anyRequest().requiresSecure(); // HTTPS 강제 => 배포할 때 수정
+        //.requiresChannel().anyRequest().requiresSecure(); // HTTPS 강제 => 배포할 때 수정
     }
 }
