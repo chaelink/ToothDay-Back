@@ -42,7 +42,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
                 .addFilter(new JwtAuthenticationFilter(authenticationManager(), userRepository))
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), userRepository))
                 .authorizeRequests()
-                .anyRequest().permitAll();
-        //.requiresChannel().anyRequest().requiresSecure(); // HTTPS 강제 => 배포할 때 수정
+                .anyRequest().permitAll()
+                .and()
+                .requiresChannel()
+                .anyRequest().requiresSecure(); // HTTPS 강제
     }
 }
