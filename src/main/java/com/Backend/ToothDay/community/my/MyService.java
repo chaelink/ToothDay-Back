@@ -30,9 +30,7 @@ public class MyService {
 
     public List<MyPostDTO> getMyPostDTOs(long userId, int limit, int offset) {
         List<Post> postList = postRepository.findByUserIdPaging(userId, limit, offset);
-        if (postList.isEmpty()) {
-            throw new RuntimeException("작성한 글이 없습니다");
-        }
+
         List<MyPostDTO> myPostDTOList = new ArrayList<>();
 
         for (Post post : postList) {
@@ -59,9 +57,7 @@ public class MyService {
 
     public List<MyLikePostDTO> getMyLikePostDTOs(long userId, int limit, int offset) {
         List<PostLike> postLikeList = likeService.findByuserIdPaging(userId, limit, offset);
-        if (postLikeList.isEmpty()) {
-            throw new RuntimeException("좋아요한 글이 없습니다");
-        }
+
         List<MyLikePostDTO> myLikePostDTOList = new ArrayList<>();
 
         for (PostLike postLike : postLikeList) {
@@ -92,9 +88,7 @@ public class MyService {
 
     public List<MyCommentPostDTO> getMyCommentPostDTOs (long userId, int limit, int offset) {
         List<Comment> commentList = commentService.findByUserIdPaging(userId, limit, offset);
-        if(commentList.isEmpty()) {
-            throw new RuntimeException("작성한 댓글이 없습니다");
-        }
+
         List<MyCommentPostDTO> myCommentPostDTOList = new ArrayList<>();
 
         for (Comment comment : commentList) {

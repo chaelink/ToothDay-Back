@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.Backend.ToothDay.jwt.config.auth.PrincipalDetails;
 import com.Backend.ToothDay.jwt.dto.LoginRequestDto;
+import com.Backend.ToothDay.jwt.model.User;
+import com.Backend.ToothDay.jwt.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -26,6 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter{
 
     private final AuthenticationManager authenticationManager;
+    private final UserRepository userRepository; // UserRepository 추가
 
     // Authentication 객체 만들어서 리턴 => 의존 : AuthenticationManager
     // 인증 요청시에 실행되는 함수 => /login
@@ -44,7 +47,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             e.printStackTrace();
         }
 
-        System.out.println("JwtAuthenticationFilter : "+loginRequestDto);
+//        System.out.println("JwtAuthenticationFilter : "+loginRequestDto);
 
         // 유저네임패스워드 토큰 생성
         UsernamePasswordAuthenticationToken authenticationToken =
@@ -52,7 +55,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                         loginRequestDto.getUsername(),
                         loginRequestDto.getPassword());
 
-        System.out.println("JwtAuthenticationFilter : 토큰생성완료");
+//        System.out.println("JwtAuthenticationFilter : 토큰생성완료");
 
         // authenticate() 함수가 호출 되면 인증 프로바이더가 유저 디테일 서비스의
         // loadUserByUsername(토큰의 첫번째 파라메터) 를 호출하고
@@ -67,7 +70,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 authenticationManager.authenticate(authenticationToken);
 
         PrincipalDetails principalDetailis = (PrincipalDetails) authentication.getPrincipal();
-        System.out.println("Authentication : "+principalDetailis.getUser().getUsername());
+//        System.out.println("Authentication : "+principalDetailis.getUser().getUsername());
         return authentication;
     }
 
@@ -76,16 +79,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
 
-        PrincipalDetails principalDetailis = (PrincipalDetails) authResult.getPrincipal();
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
 
+        // DB에서 최신 사용자 정보를 조회
+        User userEntity = userRepository.findById(principalDetails.getUser().getId()).orElseThrow();
+
+        // 최신 사용자 정보를 기반으로 JWT 토큰 생성
         String jwtToken = JWT.create()
-                .withSubject(principalDetailis.getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis()+JwtProperties.EXPIRATION_TIME))
-                .withClaim("id", principalDetailis.getUser().getId())
-                .withClaim("username", principalDetailis.getUser().getUsername())
+                .withSubject(userEntity.getUsername())
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .withClaim("id", userEntity.getId())
+                .withClaim("username", userEntity.getUsername())
                 .sign(Algorithm.HMAC512(JwtProperties.SECRET));
 
-        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX+jwtToken);
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
     }
-
 }
