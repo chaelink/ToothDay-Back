@@ -27,12 +27,12 @@ public class GoogleUser implements OAuthUserInfo{
 
     @Override
     public String getName() {
-        return (String)attribute.get("name");
+        return (String)attribute.get("username");
     }
 
     @Override
     public String getProfileImageUrl() {
-        return (String)attribute.get("picture");
+        return (String)attribute.get("profileImageUrl");
     }
 
 }
