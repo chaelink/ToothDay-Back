@@ -1,9 +1,7 @@
 package com.Backend.ToothDay.visit.model;
 
-
 import com.Backend.ToothDay.jwt.model.User;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonBackReference; // 추가
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
@@ -14,7 +12,6 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -24,14 +21,10 @@ import java.util.List;
 @Builder
 public class Visit {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "visit_id")
     private long id;
-
-    // Removed redundant fields
-    // private int dentistId;
-    // private String dentistName;
-    // private String dentistAddress;
 
     @Column(name = "visit_date")
     private String visitDate;
@@ -45,7 +38,7 @@ public class Visit {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnore // 순환 참조 방지
+    @JsonBackReference // 순환 참조 방지
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,4 +48,15 @@ public class Visit {
     @OneToMany(mappedBy = "visit", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 순환 참조 방지
     private List<Treatment> treatmentlist;
+
+    @Override
+    public String toString() {
+        return "Visit{" +
+                "id=" + id +
+                ", visitDate='" + visitDate + '\'' +
+                ", isShared=" + isShared +
+                ", createDate=" + createDate +
+                '}';
+    }
+
 }
