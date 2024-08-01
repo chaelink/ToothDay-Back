@@ -5,7 +5,6 @@ import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.community.post.model.PostKeyword;
 import com.Backend.ToothDay.community.post.model.PostKeywordId;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -112,17 +111,17 @@ public class PostRepository {
     }
 
     public List<Post> findAllPaging(int limit, int offset) {
-
-        return em.createQuery("from Post", Post.class)
+        return em.createQuery("from Post p ORDER BY p.createDate DESC", Post.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
                 .getResultList();
     }
 
 
+
     public List<Post> findByKeywordIdPaging(int keywordId, int limit, int offset) {
         //PostKeyword에서 keywordId로 Post 조회
-        String queryStr = "SELECT pk.post FROM PostKeyword pk WHERE pk.keyword.id = :keywordId";
+        String queryStr = "SELECT pk.post FROM PostKeyword pk WHERE pk.keyword.id = :keywordId order by pk.post.createDate DESC";
         TypedQuery<Post> query = em.createQuery(queryStr, Post.class)
                 .setParameter("keywordId", keywordId)
                 .setFirstResult(offset)
@@ -138,7 +137,7 @@ public class PostRepository {
     }
 
     public List<Post> findByUserIdPaging(long userId, int limit, int offset) {
-        return em.createQuery("select p from Post p where p.user.id = :userId",Post.class)
+        return em.createQuery("select p from Post p where p.user.id = :userId order by p.createDate DESC ",Post.class)
                 .setParameter("userId",userId)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
