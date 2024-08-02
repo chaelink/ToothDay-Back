@@ -42,8 +42,8 @@ public class UserController {
 
     @PutMapping("/api/user/profile")
     public UserDTO updateProfile(@RequestPart(value = "profileImage", required = false) MultipartFile profileImage,
-                              @RequestPart(value ="request",  required = false) String requestJson,
-                              HttpServletRequest httpServletRequest) throws IOException {
+                                 @RequestPart(value ="request",  required = false) String requestJson,
+                                 HttpServletRequest httpServletRequest) throws IOException {
         // JWT 토큰에서 userId 추출
         String token = httpServletRequest.getHeader("Authorization").replace("Bearer ", "");
         Long userId = jwtUtil.getUserIdFromToken(token);
@@ -74,6 +74,9 @@ public class UserController {
             if (request.getUsername() != null) {
                 user.setUsername(request.getUsername());
             }
+            if (request.isDefaultY()) {
+                user.setProfileImageUrl(null);
+            }
         }
         // 수정된 User 객체를 저장합니다.
         userRepository.save(user);
@@ -84,6 +87,9 @@ public class UserController {
     @Data
     private static class UserProfileUpdateRequest {
         private String username;
+        private boolean defaultY;
+
+
     }
     @DeleteMapping("/api/user/profile")
     public ResponseEntity<String> deleteUser(HttpServletRequest httpServletRequest) {

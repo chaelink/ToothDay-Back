@@ -1,8 +1,8 @@
 package com.Backend.ToothDay.jwt.config.jwt;
 
 public interface JwtProperties {
-    String SECRET = "swifffff50555"; // 우리 서버만 알고 있는 비밀값
-    int EXPIRATION_TIME = 864000000; // 10일 (1/1000초)
-    String TOKEN_PREFIX = "Bearer ";
-    String HEADER_STRING = "Authorization";
+    String SECRET = ""; 
+    int EXPIRATION_TIME = ;
+    String TOKEN_PREFIX = "";
+    String HEADER_STRING = "";
 }

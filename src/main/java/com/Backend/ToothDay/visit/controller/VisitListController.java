@@ -2,12 +2,14 @@ package com.Backend.ToothDay.visit.controller;
 
 import com.Backend.ToothDay.visit.dto.VisitListDTO;
 import com.Backend.ToothDay.visit.service.VisitListService;
+import com.Backend.ToothDay.visit.util.CategoryMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/visit")
@@ -27,12 +29,16 @@ public class VisitListController {
 
     @GetMapping("/categories")
     public List<VisitListDTO> getVisitsByCategories(
-            @RequestParam List<String> categories,
-            @RequestParam(value = "offset", defaultValue = "0")int offset,
-            @RequestParam(value = "limit", defaultValue = "10")int limit,
+            @RequestParam List<Integer> categories,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
             HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getVisitsByCategories(categories, token, offset, limit);
+        // 숫자 카테고리를 한글 카테고리로 변환
+        List<String> categoryNames = categories.stream()
+                .map(CategoryMapper::getCategoryName)
+                .collect(Collectors.toList());
+        return visitListService.getVisitsByCategories(categoryNames, token, offset, limit);
     }
 
     @GetMapping("/{visitId}")
@@ -45,14 +51,15 @@ public class VisitListController {
 
     @GetMapping("/category/{category}")
     public List<VisitListDTO> getVisitsByCategory(
-            @PathVariable String category,
-            @RequestParam(value = "offset", defaultValue = "0")int offset,
-            @RequestParam(value = "limit", defaultValue = "10")int limit,
+            @PathVariable int category,
+            @RequestParam(value = "offset", defaultValue = "0") int offset,
+            @RequestParam(value = "limit", defaultValue = "10") int limit,
             HttpServletRequest request) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
-        return visitListService.getVisitsByCategory(category, token, offset, limit);
+        String categoryName = CategoryMapper.getCategoryName(category);
+        return visitListService.getVisitsByCategory(categoryName, token, offset, limit);
     }
-    @GetMapping("/category/전체")
+    @GetMapping("/category/1")
     public List<VisitListDTO> getAllVisits(
             @RequestParam(value = "offset", defaultValue = "0")int offset,
             @RequestParam(value = "limit", defaultValue = "10")int limit,

@@ -26,7 +26,8 @@ import java.util.List;
 @Builder
 public class User {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private long id;
 
@@ -43,8 +44,7 @@ public class User {
     @CreationTimestamp
     private Timestamp createDate;
 
-    //회원탈퇴 위해 추가한 내용
-    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference // 순환 참조 방지
     private List<Post> posts;
 
@@ -60,12 +60,23 @@ public class User {
     @JsonManagedReference // 순환 참조 방지
     private List<PostLike> postLikes;
 
-
-    // ENUM으로 안하고 ,로 해서 구분해서 ROLE을 입력 -> 그걸 파싱!!
     public List<String> getRoleList(){
         if(this.roles.length() > 0){
             return Arrays.asList(this.roles.split(","));
         }
         return new ArrayList<>();
+    }
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", roles='" + roles + '\'' +
+                ", profileImageUrl='" + profileImageUrl + '\'' +
+                ", providerId='" + providerId + '\'' +
+                ", provider='" + provider + '\'' +
+                ", createDate=" + createDate +
+                '}';
     }
 }

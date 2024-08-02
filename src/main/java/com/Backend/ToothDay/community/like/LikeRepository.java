@@ -38,7 +38,7 @@ public class LikeRepository {
     }
 
     public List<PostLike> findByUserIdPaging(long userId, int limit, int offset) {
-        return em.createQuery("select pl from PostLike pl where pl.user.id=:userId", PostLike.class)
+        return em.createQuery("select pl from PostLike pl where pl.user.id=:userId order by pl.id DESC ", PostLike.class)
                 .setParameter("userId", userId)
                 .setFirstResult(offset)
                 .setMaxResults(limit)

@@ -37,7 +37,7 @@ public class CommentRepository {
     }
 
     public List<Comment> findByUserIdPaging(long userId, int limit, int offset) {
-        return em.createQuery("select c from Comment c where c.user.id = : userId", Comment.class)
+        return em.createQuery("select c from Comment c where c.user.id = : userId order by c.id desc ", Comment.class)
                 .setParameter("userId", userId)
                 .setFirstResult(offset)
                 .setMaxResults(limit)

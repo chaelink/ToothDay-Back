@@ -8,6 +8,7 @@ import com.Backend.ToothDay.community.post.model.PostForm;
 import com.Backend.ToothDay.jwt.config.jwt.JwtUtil;
 import com.Backend.ToothDay.jwt.model.User;
 import com.Backend.ToothDay.jwt.repository.UserRepository;
+import io.swagger.annotations.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +21,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Api(description = "커뮤니티 게시글 API") //컨트롤러 설명 작성
 public class PostController {
 
     private final UserRepository userRepository;
@@ -28,12 +30,14 @@ public class PostController {
     private final ImageService imageService;
     private final LikeService likeService;
 
+    @ApiOperation(value = "비유저 커뮤니티 첫화면(무한스크롤)")
     @GetMapping("/community") //비유저 커뮤니티 첫화면 페이징
     public List<PostDTO> NonLoginCommunityMain(@RequestParam(value = "offset", defaultValue = "0") int offset,
                                                @RequestParam(value = "limit", defaultValue = "10") int limit) {
         return postService.getAllPostDTOPaging(limit, offset);
     }
 
+    @ApiOperation(value = "유저 커뮤니티 첫화면(무한스크롤)")
     @GetMapping("/api/community") //유저 커뮤니티 첫화면 페이징
     public List<PostDTO> communityMain(HttpServletRequest request,
                                        @RequestParam(value = "offset", defaultValue = "0") int offset,
@@ -73,9 +77,9 @@ public class PostController {
 
     @GetMapping("/api/community/search/{keywordId}") //유저 게시글목록 조회 페이징
     public List<PostDTO> communityFindByKeywordIdPaging(@PathVariable int keywordId,
-                                                  HttpServletRequest request,
-                                                  @RequestParam(value = "offset", defaultValue = "0") int offset,
-                                                   @RequestParam(value = "limit", defaultValue = "10") int limit) {
+                                                        HttpServletRequest request,
+                                                        @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                                        @RequestParam(value = "limit", defaultValue = "10") int limit) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
         Long userId = JwtUtil.getUserIdFromToken(token);
         List<PostDTO> postDTOList = postService.getPostDTOByKeywordIdPaging(keywordId, limit, offset);
@@ -101,12 +105,55 @@ public class PostController {
         return postDTOList;
     }
 
+    @GetMapping("/community/search")
+    public List<PostDTO> communitySearch(@RequestParam(value = "search") String search,
+                                         @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                         @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return postService.getPostDTOByQueryPaging(search, offset, limit);
+    }
+
+    @GetMapping("/api/community/search")
+    public List<PostDTO> communitySearch(HttpServletRequest request,
+                                         @RequestBody String search,
+                                         @RequestParam(value = "offset", defaultValue = "0") int offset,
+                                         @RequestParam(value = "limit", defaultValue = "10") int limit ) {
+        String token = request.getHeader("Authorization").replace("Bearer ", "");
+        Long userId = JwtUtil.getUserIdFromToken(token);
+        List<PostDTO> postDTOList = postService.getPostDTOByQueryPaging(search, offset, limit);
+        for (PostDTO postDTO : postDTOList) {
+            if(likeService.findByPostIdAndUserId(postDTO.getPostId(), userId) != null) {
+                postDTO.setLikedByCurrentUser(true);
+            } else {
+                postDTO.setLikedByCurrentUser(false);
+            }
+            if(postDTO.getUser().getId()==userId) {
+                postDTO.setWrittenByCurrentUser(true);
+            } else {
+                postDTO.setWrittenByCurrentUser(false);
+            }
+            for(CommentDTO commentDTO : postDTO.getCommentDTOList()) {
+                if(commentDTO.getUserId()==userId) {
+                    commentDTO.setWrittenByCurrentUser(true);
+                } else {
+                    commentDTO.setWrittenByCurrentUser(false);
+                }
+            }
+        }
+        return postDTOList;
+    }
+
+
     @GetMapping("/community/upload") //커뮤니티 작성 화면
     public PostForm communityUploadForm() {
         return new PostForm();
     }
 
+
     @PostMapping("/community/upload") //게시글 작성
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "postForm", value = "게시글 데이터", required = true, dataType = "Text", defaultValue = "multipart/form-data" ),
+//            @ApiImplicitParam(name = "files", value = "게시글 이미지", required = false, dataType = "File", defaultValue = "multipart/form-data")
+//    })
     public PostDTO communityUpload(@RequestPart(value = "postForm") PostForm postForm,
                                    @RequestPart(value = "files",required = false) List<MultipartFile> files,
                                    HttpServletRequest request) {
@@ -176,7 +223,8 @@ public class PostController {
             post.setTitle(postForm.getTitle());  //새로운 post 정보 설정
             post.setContent(postForm.getContent());
             postKeywordRepository.deleteAllByPostId(postId);  //기존의 postkeyword삭제
-            postService.save(post,postForm.getKeywords());
+            post.getPostKeywords().clear();  //403에러수정
+            postService.resave(post,postForm.getKeywords());  //수정 위한 저장 메서드 생성
             if(post.getImageList()!=null) {
                 imageService.deleteAllByPostId(postId);
             }

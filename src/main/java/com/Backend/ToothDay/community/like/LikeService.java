@@ -19,6 +19,7 @@ public class LikeService {
     private final LikeRepository likeRepository;
     private final WebSocketHandler webSocketHandler; // 웹소켓 핸들러 추가
     private final NotificationService notificationService; // NotificationService 추가
+
     public void save(PostLike like) {
         likeRepository.save(like);
         Post post = like.getPost();
@@ -38,7 +39,8 @@ public class LikeService {
             // 웹소켓 알림 전송
             webSocketHandler.sendNotification(postAuthor.getId(), "LIKE", post.getId(), post.getTitle(), likeAuthor.getUsername());
         }
-    }    public void delete(PostLike like) {
+    }
+    public void delete(PostLike like) {
         likeRepository.delete(like);
     }
 

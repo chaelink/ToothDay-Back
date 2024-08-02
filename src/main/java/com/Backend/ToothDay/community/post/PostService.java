@@ -29,6 +29,8 @@ public class PostService {
 
     public void save(Post post, List<Integer> keywordIds) { postRepository.save(post, keywordIds); }
 
+    public void resave(Post post, List<Integer> keywordIds) { postRepository.resave(post, keywordIds); }
+
     public void delete(Post post) {
         postRepository.delete(post);
     }
@@ -69,6 +71,12 @@ public class PostService {
 
     public List<PostDTO> getPostDTOByKeywordIdPaging(int keywordId, int limit, int offset) {
         List<Post> posts = postRepository.findByKeywordIdPaging(keywordId, limit, offset);
+        return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
+    }
+
+    public List<PostDTO> getPostDTOByQueryPaging(String query, int limit, int offset) {
+        List<Post> posts = postRepository.search(query, limit, offset);
+        System.out.println(posts);
         return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
     }
 
