@@ -4,12 +4,14 @@ import com.Backend.ToothDay.community.like.LikeService;
 import com.Backend.ToothDay.community.post.model.Post;
 import com.Backend.ToothDay.community.post.model.PostDTO;
 import com.Backend.ToothDay.jwt.dto.UserDTO;
+import com.Backend.ToothDay.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.awt.print.Pageable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.Backend.ToothDay.jwt.model.User;
@@ -20,6 +22,8 @@ import com.Backend.ToothDay.jwt.model.User;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final PostJPARepository postJPARepository;
+    private final NotificationRepository notificationRepository;
     private final LikeService likeService;
     private final CommentService commentService;
 
@@ -32,6 +36,7 @@ public class PostService {
     public void resave(Post post, List<Integer> keywordIds) { postRepository.resave(post, keywordIds); }
 
     public void delete(Post post) {
+        notificationRepository.deleteByPostId(post.getId());
         postRepository.delete(post);
     }
 
@@ -74,10 +79,13 @@ public class PostService {
         return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
     }
 
-    public List<PostDTO> getPostDTOByQueryPaging(String query, int limit, int offset) {
-        List<Post> posts = postRepository.search(query, limit, offset);
-        System.out.println(posts);
-        return posts.stream().map(post->getPostDTO(post)).collect(Collectors.toList());
+    public List<PostDTO> getPostDTOByQueryPaging(String query, int offset, int limit) {
+
+        List<Post> posts = postRepository.findByTitleContaining(query, offset, limit);
+
+        return posts.stream()
+                .map(this::getPostDTO).
+                collect(Collectors.toList());
     }
 
 }

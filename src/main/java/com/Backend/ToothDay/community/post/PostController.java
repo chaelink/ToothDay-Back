@@ -29,6 +29,7 @@ public class PostController {
     private final PostService postService;
     private final ImageService imageService;
     private final LikeService likeService;
+    private final PostRepository postRepository;
 
     @ApiOperation(value = "비유저 커뮤니티 첫화면(무한스크롤)")
     @GetMapping("/community") //비유저 커뮤니티 첫화면 페이징
@@ -114,7 +115,7 @@ public class PostController {
 
     @GetMapping("/api/community/search")
     public List<PostDTO> communitySearch(HttpServletRequest request,
-                                         @RequestBody String search,
+                                         @RequestParam(value = "search") String search,
                                          @RequestParam(value = "offset", defaultValue = "0") int offset,
                                          @RequestParam(value = "limit", defaultValue = "10") int limit ) {
         String token = request.getHeader("Authorization").replace("Bearer ", "");
@@ -140,6 +141,7 @@ public class PostController {
             }
         }
         return postDTOList;
+
     }
 
 
@@ -223,7 +225,7 @@ public class PostController {
             post.setTitle(postForm.getTitle());  //새로운 post 정보 설정
             post.setContent(postForm.getContent());
             postKeywordRepository.deleteAllByPostId(postId);  //기존의 postkeyword삭제
-            post.getPostKeywords().clear();  //403에러수정
+            //post.getPostKeywords().clear();  //403에러수정
             postService.resave(post,postForm.getKeywords());  //수정 위한 저장 메서드 생성
             if(post.getImageList()!=null) {
                 imageService.deleteAllByPostId(postId);

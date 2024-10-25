@@ -1,10 +1,8 @@
 package com.Backend.ToothDay.community.post;
 
-import com.Backend.ToothDay.community.post.model.Keyword;
-import com.Backend.ToothDay.community.post.model.Post;
-import com.Backend.ToothDay.community.post.model.PostKeyword;
-import com.Backend.ToothDay.community.post.model.PostKeywordId;
+import com.Backend.ToothDay.community.post.model.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -21,6 +19,9 @@ public class PostRepository {
     @PersistenceContext
     private EntityManager em;
 
+    @Autowired
+    private PostJPARepository postJPARepository;
+
     public void save(Post post, List<Integer> keywordIds) {
         em.persist(post);
         if(CollectionUtils.isEmpty(keywordIds)) {
@@ -34,7 +35,7 @@ public class PostRepository {
             postKeyword.setPost(post);
             postKeyword.setKeyword(keyword);
             em.persist(postKeyword);
-            post.getPostKeywords().add(postKeyword);
+            //post.getPostKeywords().add(postKeyword);
         }
         else {
             Keyword keyword1 = em.find(Keyword.class,1);
@@ -47,7 +48,7 @@ public class PostRepository {
             postKeyword1.setPost(post);
             postKeyword1.setKeyword(keyword1);
             em.persist(postKeyword1);
-            post.getPostKeywords().add(postKeyword1);
+            //post.getPostKeywords().add(postKeyword1);
             for (Integer keywordId : keywordIds) {
                 Keyword keyword = em.find(Keyword.class, keywordId);
                 if(keyword != null) {
@@ -57,7 +58,7 @@ public class PostRepository {
                     postKeyword.setPost(post);
                     postKeyword.setKeyword(keyword);
                     em.persist(postKeyword);
-                    post.getPostKeywords().add(postKeyword);
+                    //post.getPostKeywords().add(postKeyword);
                 }
                 else {
                     throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
@@ -78,7 +79,7 @@ public class PostRepository {
             postKeyword.setPost(post);
             postKeyword.setKeyword(keyword);
             em.persist(postKeyword);
-            post.getPostKeywords().add(postKeyword);
+            //post.getPostKeywords().add(postKeyword);
         }
         else {
             Keyword keyword1 = em.find(Keyword.class,1);
@@ -91,7 +92,7 @@ public class PostRepository {
             postKeyword1.setPost(post);
             postKeyword1.setKeyword(keyword1);
             em.persist(postKeyword1);
-            post.getPostKeywords().add(postKeyword1);
+            //post.getPostKeywords().add(postKeyword1);
             for (Integer keywordId : keywordIds) {
                 Keyword keyword = em.find(Keyword.class, keywordId);
                 if(keyword != null) {
@@ -101,7 +102,7 @@ public class PostRepository {
                     postKeyword.setPost(post);
                     postKeyword.setKeyword(keyword);
                     em.persist(postKeyword);
-                    post.getPostKeywords().add(postKeyword);
+                    //post.getPostKeywords().add(postKeyword);
                 }
                 else {
                     throw new IllegalArgumentException("Keyword with ID " + keywordId + " not found");
@@ -118,6 +119,32 @@ public class PostRepository {
     }
 
 
+    public List<Post> findByTitleContaining(String search, int offset, int limit) {
+        // '%' + search + '%'로 검색 패턴 설정
+        String searchPattern = "%" + search + "%";
+
+        String queryStr = "SELECT p FROM Post p WHERE p.title LIKE :searchPattern ORDER BY p.createDate DESC";
+        TypedQuery<Post> query = em.createQuery(queryStr, Post.class)
+                .setParameter("searchPattern", searchPattern)
+                .setFirstResult(offset)  // 페이징을 위한 offset 설정
+                .setMaxResults(limit);   // 페이징을 위한 limit 설정
+
+        return query.getResultList();
+    }
+
+    public List<Post> findc(String search, int limit, int offset) {
+        // '%' + search + '%'로 검색 패턴 설정
+        String searchPattern = "%" + search + "%";
+
+        String queryStr = "SELECT p FROM Post p WHERE p.title LIKE :searchPattern ORDER BY p.createDate DESC";
+        TypedQuery<Post> query = em.createQuery(queryStr, Post.class)
+                .setParameter("searchPattern", searchPattern)
+                .setFirstResult(offset)  // 페이징을 위한 offset 설정
+                .setMaxResults(limit);   // 페이징을 위한 limit 설정
+
+        return query.getResultList();
+    }
+
 
     public List<Post> findByKeywordIdPaging(int keywordId, int limit, int offset) {
         //PostKeyword에서 keywordId로 Post 조회
@@ -129,8 +156,6 @@ public class PostRepository {
 
         return query.getResultList();
     }
-
-
 
     public Post findById(long postId) {
         return em.find(Post.class, postId);
@@ -144,37 +169,6 @@ public class PostRepository {
                 .getResultList();
     }
 
-//    public List<Post> searchPosts(String query, int limit, int offset) {
-//        String formattedQuery = "%" + query + "%";
-//        return em.createQuery("select p from Post p where p.title like :query", Post.class)
-//                .setParameter("query", formattedQuery)
-//                .setFirstResult(offset)
-//                .setMaxResults(limit)
-//                .getResultList();
-//    }
-
-    public List<Post> searchPosts(String query, int limit, int offset) {
-        String formattedQuery = "%" + query + "%";
-        log.debug("Executing search with query: {}", formattedQuery);
-        List<Post> results = em.createQuery("select p from Post p where p.title like :query", Post.class)
-                .setParameter("query", formattedQuery)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
-        log.debug("Search results: {}", results);
-        return results;
-    }
-
-    public List<Post> search(String search, int limit, int offset) {
-        return em.createQuery("select p from Post p where p.title=: search ",Post.class)
-                .setParameter("search",search)
-                .setFirstResult(offset)
-                .setMaxResults(limit)
-                .getResultList();
-    }
-
     public void delete(Post post) {
         em.remove(em.merge(post));
-    }
-
-}
+    }}
